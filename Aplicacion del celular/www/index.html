@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1, user-scalable=no">
+  <meta name="theme-color" content="#1F6FEB">
+  <meta name="color-scheme" content="light">
+  <title>PetSafe IoT</title>
+  <link rel="icon" href="assets/icon/favicon-32.png" sizes="32x32">
+  <link rel="apple-touch-icon" href="assets/icon/icon-192.png">
+  <link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+
+<div class="app">
+
+  <!-- ══════════════ CABECERA ══════════════ -->
+  <header class="appbar" id="appbar">
+    <div class="appbar-row">
+      <div class="brand">
+        <div class="brand-mark">PS</div>
+        <div class="brand-txt">
+          <b>PETSAFE HOME</b>
+          <small id="connLine">ESP32 · DHT22 · conectando…</small>
+        </div>
+      </div>
+      <button class="pet-chip" id="petChip" aria-label="Perfil de la mascota">
+        <span class="pet-avatar" id="petAvatar">🐕</span>
+        <span class="pet-meta">
+          <b id="petName">Buddy</b>
+          <small id="petRoom">Habitación</small>
+        </span>
+      </button>
+    </div>
+  </header>
+
+  <!-- ══════════════ CONTENIDO ══════════════ -->
+  <main class="scroll" id="scroll">
+
+    <!-- ─────────── VISTA 1 · DASHBOARD ─────────── -->
+    <section class="view" id="view-dashboard">
+
+      <div class="state-banner" id="stateBanner">
+        <div class="sb-ico" id="sbIco">🌡️</div>
+        <div class="sb-txt">
+          <b id="sbTitle">Estado: Normal</b>
+          <small id="sbHint">Ambiente cómodo para Buddy</small>
+        </div>
+        <div class="sb-pulse" id="sbPulse"></div>
+      </div>
+
+      <div class="gauges">
+        <div class="card gauge" id="gaugeTemp">
+          <div class="card-head">
+            <span class="lbl"><i class="dot"></i>TEMPERATURA</span>
+          </div>
+          <div class="gauge-body">
+            <svg class="arc" viewBox="0 0 120 74" aria-hidden="true">
+              <defs>
+                <linearGradient id="gArc" x1="0" y1="0" x2="1" y2="0">
+                  <stop offset="0%"   stop-color="#3B82F6"/>
+                  <stop offset="38%"  stop-color="#17A34A"/>
+                  <stop offset="72%"  stop-color="#F08A24"/>
+                  <stop offset="100%" stop-color="#E5484D"/>
+                </linearGradient>
+              </defs>
+              <path class="arc-bg"  d="M10 68 A50 50 0 0 1 110 68" />
+              <path class="arc-val" id="arcTemp" d="M10 68 A50 50 0 0 1 110 68" />
+            </svg>
+            <div class="gauge-read">
+              <b id="tempVal">--.-<span class="u">°C</span></b>
+            </div>
+          </div>
+          <div class="gauge-foot">
+            <span class="tag" id="tempTag">—</span>
+            <span class="foot-note" id="tempMin">mín —</span>
+            <span class="foot-note" id="tempMax">máx —</span>
+          </div>
+        </div>
+
+        <div class="card gauge" id="gaugeHum">
+          <div class="card-head">
+            <span class="lbl"><i class="dot"></i>HUMEDAD</span>
+          </div>
+          <div class="gauge-body">
+            <svg class="arc" viewBox="0 0 120 74" aria-hidden="true">
+              <defs>
+                <linearGradient id="gArcH" x1="0" y1="0" x2="1" y2="0">
+                  <stop offset="0%"   stop-color="#7CC0FF"/>
+                  <stop offset="50%"  stop-color="#2F80ED"/>
+                  <stop offset="100%" stop-color="#1F6FEB"/>
+                </linearGradient>
+              </defs>
+              <path class="arc-bg"  d="M10 68 A50 50 0 0 1 110 68" />
+              <path class="arc-val" id="arcHum" d="M10 68 A50 50 0 0 1 110 68" />
+            </svg>
+            <div class="gauge-read">
+              <b id="humVal">--<span class="u">%</span></b>
+            </div>
+          </div>
+          <div class="gauge-foot">
+            <span class="tag" id="humTag">—</span>
+            <span class="foot-note" id="humNote">rango 40–70%</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="card actuator" id="actuatorCard">
+        <button class="act-btn" id="fanBtn" aria-pressed="false">
+          <span class="act-ico" id="fanIco">🌀</span>
+        </button>
+        <div class="act-info">
+          <b id="fanTitle">Ventilador</b>
+          <small id="fanHint">Toca para activar manualmente</small>
+          <div class="mode-row">
+            <span class="mode-chip active" id="modeAuto">AUTO (ESP32)</span>
+            <span class="mode-chip" id="modeMan">MANUAL</span>
+          </div>
+        </div>
+        <span class="power-chip" id="powerChip">OFF</span>
+      </div>
+
+      <div class="card chart-card">
+        <div class="card-head">
+          <span class="lbl"><i class="dot blue"></i>ÚLTIMAS 24 HORAS</span>
+          <div class="seg" id="chartRange">
+            <button data-h="1">1 h</button>
+            <button data-h="6">6 h</button>
+            <button data-h="24" class="on">24 h</button>
+          </div>
+        </div>
+        <div class="chart-wrap">
+          <div class="y-axis" id="yAxis"></div>
+          <div class="chart-host" id="chartHost"></div>
+        </div>
+        <div class="x-axis" id="xAxis"></div>
+        <div class="stats-row">
+          <div class="stat"><small>Mínima</small><b id="stMin">—</b></div>
+          <div class="stat"><small>Media</small><b id="stAvg">—</b></div>
+          <div class="stat"><small>Máxima</small><b id="stMax">—</b></div>
+          <div class="stat"><small>Alertas 24 h</small><b id="stAlerts">—</b></div>
+        </div>
+      </div>
+
+      <div class="card quick-card">
+        <div class="card-head"><span class="lbl"><i class="dot blue"></i>CONEXIÓN ESP32</span></div>
+        <div class="kv-grid">
+          <div class="kv"><small>Dispositivo</small><b id="kvDev">—</b></div>
+          <div class="kv"><small>Señal</small><b id="kvRssi">—</b></div>
+          <div class="kv"><small>Última lectura</small><b id="kvAge">—</b></div>
+          <div class="kv"><small>Modo</small><b id="kvMode">Simulador</b></div>
+        </div>
+        <div class="btn-row">
+          <button class="btn ghost sm" id="btnSerial">Conectar por USB</button>
+          <button class="btn ghost sm" id="btnSim">Simulador</button>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- ─────────── VISTA 2 · HISTORIAL ─────────── -->
+    <section class="view" id="view-history" hidden>
+      <div class="view-title">
+        <h2>HISTORIAL DE EVENTOS</h2>
+        <p>Registro codificado por estado · <span id="logCount">0</span> eventos</p>
+      </div>
+
+      <div class="filters" id="logFilters">
+        <button class="chip on" data-f="all">Todos</button>
+        <button class="chip crit" data-f="CRITICO">Crítico</button>
+        <button class="chip hot"  data-f="CALOR">Calor</button>
+        <button class="chip norm" data-f="NORMAL">Normal</button>
+        <button class="chip cold" data-f="FRIO">Frío</button>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn ghost sm" id="btnExport">Exportar CSV</button>
+        <button class="btn ghost sm danger" id="btnClear">Borrar registro</button>
+      </div>
+
+      <ul class="log" id="logList"></ul>
+      <div class="empty" id="logEmpty" hidden>
+        <span>📭</span>
+        <b>Sin eventos todavía</b>
+        <small>Los cambios de estado aparecerán aquí automáticamente.</small>
+      </div>
+    </section>
+
+    <!-- ─────────── VISTA 3 · AJUSTES ─────────── -->
+    <section class="view" id="view-settings" hidden>
+
+      <div class="view-title">
+        <h2>CONFIGURACIÓN DE LÍMITES</h2>
+        <p>Umbrales del sistema de estados</p>
+      </div>
+
+      <div class="card">
+        <div class="card-head"><span class="lbl"><i class="dot blue"></i>LÍMITES DE TEMPERATURA</span></div>
+
+        <div class="zones" id="zones"></div>
+
+        <div class="slider-row">
+          <label>Umbral <b class="s-blue">Frío</b> <output id="outCold">20°C</output></label>
+          <input type="range" id="slCold" min="10" max="22" step="0.5" value="20">
+        </div>
+        <div class="slider-row">
+          <label>Umbral <b class="s-orange">Calor</b> <output id="outHot">27°C</output></label>
+          <input type="range" id="slHot" min="22" max="30" step="0.5" value="27">
+        </div>
+        <div class="slider-row">
+          <label>Umbral <b class="s-red">Crítico</b> <output id="outCrit">28°C</output></label>
+          <input type="range" id="slCrit" min="26" max="36" step="0.5" value="28">
+        </div>
+
+        <ul class="legend" id="stateLegend"></ul>
+      </div>
+
+      <div class="card">
+        <div class="card-head"><span class="lbl"><i class="dot blue"></i>RANGO DE HUMEDAD</span></div>
+        <div class="slider-row">
+          <label>Mínima <output id="outHumMin">40%</output></label>
+          <input type="range" id="slHumMin" min="20" max="60" step="1" value="40">
+        </div>
+        <div class="slider-row">
+          <label>Máxima <output id="outHumMax">70%</output></label>
+          <input type="range" id="slHumMax" min="50" max="95" step="1" value="70">
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-head"><span class="lbl"><i class="dot blue"></i>OPCIONES</span></div>
+
+        <div class="opt">
+          <span class="opt-ico on">⚙️</span>
+          <div class="opt-txt">
+            <b>Control Automático (ESP32)</b>
+            <small>El actuador decide solo, sin depender del teléfono</small>
+          </div>
+          <button class="toggle on" data-opt="auto" role="switch" aria-checked="true"><i></i></button>
+        </div>
+        <div class="opt">
+          <span class="opt-ico on">🔔</span>
+          <div class="opt-txt">
+            <b>Recibir Alertas</b>
+            <small>Notificaciones push en Calor y Crítico</small>
+          </div>
+          <button class="toggle on" data-opt="alerts" role="switch" aria-checked="true"><i></i></button>
+        </div>
+        <div class="opt">
+          <span class="opt-ico">📳</span>
+          <div class="opt-txt">
+            <b>Sonido y vibración</b>
+            <small>Alerta sonora + vibración en evento crítico</small>
+          </div>
+          <button class="toggle on" data-opt="vibrate" role="switch" aria-checked="true"><i></i></button>
+        </div>
+        <div class="opt future">
+          <span class="opt-ico">❄️</span>
+          <div class="opt-txt">
+            <b>Conectar Aire IR <em>FUTURO</em></b>
+            <small>Requiere módulo infrarrojo externo</small>
+          </div>
+          <button class="toggle" data-opt="ir" role="switch" aria-checked="false" disabled><i></i></button>
+        </div>
+        <div class="opt future">
+          <span class="opt-ico">💧</span>
+          <div class="opt-txt">
+            <b>Sensor Agua <em>FUTURO</em></b>
+            <small>Detección de charcos y humedad residual</small>
+          </div>
+          <button class="toggle" data-opt="water" role="switch" aria-checked="false" disabled><i></i></button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-head"><span class="lbl"><i class="dot blue"></i>MASCOTA Y SISTEMA</span></div>
+        <div class="field">
+          <label for="fName">Nombre</label>
+          <input id="fName" type="text" maxlength="18" value="Buddy" autocomplete="off">
+        </div>
+        <div class="field">
+          <label for="fRoom">Habitación</label>
+          <input id="fRoom" type="text" maxlength="18" value="Habitación" autocomplete="off">
+        </div>
+        <div class="field">
+          <label for="fEmoji">Icono</label>
+          <div class="emoji-row" id="emojiRow"></div>
+        </div>
+        <div class="slider-row">
+          <label>Intervalo de muestreo <output id="outInt">5 s</output></label>
+          <input type="range" id="slInt" min="1" max="60" step="1" value="5">
+        </div>
+      </div>
+
+      <button class="btn primary big" id="btnApply">APLICAR CAMBIOS</button>
+      <div class="danger-zone">
+        <button class="btn ghost sm danger" id="btnTestNotif">Probar notificación</button>
+        <button class="btn ghost sm danger" id="btnReset">Restablecer todo</button>
+      </div>
+      <p class="ver">PetSafe IoT v1.0 · ESP32 + DHT22</p>
+    </section>
+
+  </main>
+
+  <!-- ══════════════ NAVEGACIÓN ══════════════ -->
+  <nav class="tabbar" id="tabbar">
+    <button class="tab on" data-view="dashboard"><span class="ti">🏠</span>Inicio</button>
+    <button class="tab" data-view="history"><span class="ti">🕒</span>Historial</button>
+    <button class="tab" data-view="settings"><span class="ti">⚙️</span>Ajustes</button>
+  </nav>
+
+</div>
+
+<!-- ══════════════ ALERTA EMERGENTE ══════════════ -->
+<div class="sheet-wrap" id="sheetWrap" hidden>
+  <div class="scrim" id="scrim"></div>
+  <div class="sheet" role="alertdialog" aria-labelledby="shTitle">
+    <div class="grab"></div>
+    <div class="sheet-head">
+      <div class="bell" id="shBell">🔔</div>
+      <div>
+        <b id="shTitle">¡ALERTA URGENTE!</b>
+        <small id="shSub">PetSafe IoT</small>
+      </div>
+    </div>
+    <p id="shMsg">Temp. Crítica en habitación.</p>
+    <div class="sheet-actions">
+      <button class="btn ghost" id="shDismiss">Descartar</button>
+      <button class="btn primary" id="shOpen">Ver registro</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast" hidden></div>
+
+<script src="js/store.js"></script>
+<script src="js/sensor.js"></script>
+<script src="js/chart.js"></script>
+<script src="js/notifier.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

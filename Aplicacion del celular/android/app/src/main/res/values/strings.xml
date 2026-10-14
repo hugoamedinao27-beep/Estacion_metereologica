@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">PetSafe IoT</string>
+    <string name="title_activity_main">PetSafe IoT</string>
+    <string name="package_name">com.petsafe.iot</string>
+    <string name="custom_url_scheme">com.petsafe.iot</string>
+</resources>
