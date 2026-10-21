@@ -1,0 +1,18 @@
+# dependencias
+node_modules/
+
+# compilaciones
+android/build/
+android/app/build/
+android/.gradle/
+android/capacitor-cordova-android-plugins/build/
+android/local.properties
+
+# toolchain local (JDK portable usado para compilar)
+tools/jdk21/
+tools/*.zip
+
+# sistema
+.DS_Store
+Thumbs.db
+*.log

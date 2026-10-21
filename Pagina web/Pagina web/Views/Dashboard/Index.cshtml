@@ -1,0 +1,74 @@
+@model EstacionMeteorologica.Models.ViewModels.DashboardViewModel
+@{
+    ViewData["Title"] = "Dashboard";
+    var latest = Model.Latest;
+    var stateText = latest?.State.ToString() ?? "Sin datos";
+}
+
+<!-- DASHBOARD -->
+<section class="section" id="dashboard">
+  <div class="container">
+    <header class="section-head">
+      <p class="eyebrow">Monitoreo en vivo</p>
+      <h2>Dashboard de la estación</h2>
+      <p class="section-intro">
+        Cada <strong>5 segundos</strong> el navegador consulta
+        <code>/Dashboard/Latest</code> y actualiza la tarjeta y el gráfico.
+        Las lecturas las genera el sensor simulado y se persisten en Firebase.
+      </p>
+    </header>
+
+    @if (!Model.FirebaseConfigured)
+    {
+      <div class="alert alert-warning" role="alert">
+        <strong>Firebase no está configurado.</strong>
+        La aplicación funciona, pero no hay datos en vivo.
+        Complete <code>Firebase:DatabaseUrl</code> en <code>appsettings.json</code> (local)
+        o en Application Settings de Azure App Service.
+      </div>
+    }
+
+    <div class="dashboard-grid">
+      <article class="hero-card" id="statusCard">
+        <div class="hero-card-top">
+          <span class="status-dot status-@stateText.ToLowerInvariant()" id="statusDot"></span>
+          <span class="hero-card-title">Estado: <span id="statusText">@stateText</span></span>
+        </div>
+
+        <div class="hero-metrics">
+          <div class="metric">
+            <span class="metric-value" id="tempValue">@(latest is null ? "--" : latest.Temperature.ToString("0.0"))<small>°C</small></span>
+            <span class="metric-label">Temperatura</span>
+          </div>
+          <div class="metric">
+            <span class="metric-value" id="humValue">@(latest is null ? "--" : latest.Humidity.ToString("0"))<small>%</small></span>
+            <span class="metric-label">Humedad</span>
+          </div>
+        </div>
+
+        <div class="hero-card-row">
+          <span>Última actualización</span>
+          <span class="pill pill-off" id="lastUpdate">@(latest is null ? "—" : latest.Timestamp.ToLocalTime().ToString("HH:mm:ss"))</span>
+        </div>
+
+        <div class="hero-card-row" style="margin-top:0.75rem;">
+          <span>Umbral de calor</span>
+          <span class="pill pill-off" id="thresholdPill">@Model.Config.CalorThreshold °C</span>
+        </div>
+
+        <p class="live-note" id="liveNote" hidden>Conectando con el sensor…</p>
+      </article>
+
+      <article class="chart-card">
+        <h3 class="chart-title">Tendencia de temperatura</h3>
+        <div class="chart-wrap">
+          <canvas id="liveChart" aria-label="Gráfico de temperatura en vivo" role="img"></canvas>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>
+
+@section Scripts {
+  <script src="~/js/dashboard.js" defer></script>
+}

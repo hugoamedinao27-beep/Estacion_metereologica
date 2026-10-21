@@ -1119,3 +1119,18 @@ ul, ol {
   color: inherit;
   text-decoration: underline;
 }
+
+/* Clima con GPS */
+.weather-card-gps {
+  margin-top: 2rem;
+}
+.geo-controls {
+  margin-top: 1.25rem;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1rem;
+}
+.geo-actions {
+  margin-top: 1.25rem;
+}
