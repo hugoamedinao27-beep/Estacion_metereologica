@@ -4,6 +4,12 @@ Solución web **MVC** (ASP.NET Core .NET 10) para la temática **N.º 7 — Moni
 dashboard de temperatura y humedad en vivo con datos simulados, estados de alerta configurables,
 historial y gráficos. Persiste en **Firebase Realtime Database** y se despliega en **Azure App Service**.
 
+> **Demo estática (GitHub Pages)**: <https://hugoamedinao27-beep.github.io/Estacion_metereologica/>
+> Réplica estática de la interfaz para demostración rápida: la simulación corre en el navegador y la
+> persistencia usa `localStorage` (o Firebase si se configura `FIREBASE_URL` en `demo/demo.js`).
+> La aplicación MVC completa — entregable oficial — se despliega en Azure App Service.
+
+
 ## Funcionalidades (MVP)
 
 | # | Funcionalidad | Dónde |
