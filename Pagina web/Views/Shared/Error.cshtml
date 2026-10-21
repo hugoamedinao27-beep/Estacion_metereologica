@@ -1,0 +1,22 @@
+﻿@model ErrorViewModel
+@{
+    ViewData["Title"] = "Error";
+}
+
+<section class="section">
+  <div class="container">
+    <header class="section-head">
+      <p class="eyebrow">Error</p>
+      <h2>Algo salió mal</h2>
+      <p class="section-intro">
+        Ocurrió un problema al procesar la solicitud. Vuelve al
+        <a asp-controller="Home" asp-action="Index">inicio</a> e intenta nuevamente.
+      </p>
+    </header>
+
+    @if (Model.ShowRequestId)
+    {
+      <p><strong>Request ID:</strong> <code>@Model.RequestId</code></p>
+    }
+  </div>
+</section>
