@@ -166,6 +166,46 @@
           Aún no hay lecturas. Espere unos segundos y la primera aparecerá automáticamente.
         </div>
 
+        <article class="weather-card weather-card-gps" id="geoWeather" hidden>
+          <div class="weather-card-header">
+            <div>
+              <h3 id="geoLocation">Mi ubicación</h3>
+              <p id="geoTime">Actualizado —</p>
+            </div>
+            <div class="weather-main">
+              <span class="weather-icon" id="geoIcon" aria-hidden="true">🌡️</span>
+              <div>
+                <span class="weather-temp" id="geoTemp">--°</span>
+                <span class="weather-desc" id="geoDesc">—</span>
+              </div>
+            </div>
+          </div>
+          <div class="weather-grid">
+            <div class="weather-stat">
+              <span class="stat-label">Sensación térmica</span>
+              <span class="stat-value" id="geoFeels">-- °C</span>
+            </div>
+            <div class="weather-stat">
+              <span class="stat-label">Humedad</span>
+              <span class="stat-value" id="geoHumidity">-- %</span>
+            </div>
+            <div class="weather-stat">
+              <span class="stat-label">Viento</span>
+              <span class="stat-value" id="geoWind">-- km/h</span>
+            </div>
+          </div>
+          <div class="geo-actions">
+            <button type="button" class="btn btn-ghost" id="geoRefresh">Actualizar ubicación</button>
+          </div>
+        </article>
+
+        <div class="geo-controls">
+          <button type="button" class="btn btn-primary" id="geoBtn">Usar mi ubicación</button>
+          <p class="weather-source" id="geoSource" hidden>
+            Datos proporcionados por <a href="https://open-meteo.com/es" target="_blank" rel="noopener noreferrer">Open-Meteo</a> y <a href="https://nominatim.org/es" target="_blank" rel="noopener noreferrer">Nominatim (OpenStreetMap)</a>
+          </p>
+        </div>
+
         <article class="chart-card" style="margin-bottom:1.75rem;">
           <h3 class="chart-title">Temperatura y humedad</h3>
           <div class="chart-wrap chart-wrap-tall">
@@ -381,5 +421,6 @@
   <script src="wwwroot/js/site.js" defer></script>
   <script src="demo/demo.js" defer></script>
   <script src="demo/weather.js" defer></script>
+  <script src="demo/weather-geo.js" defer></script>
 </body>
 </html>
