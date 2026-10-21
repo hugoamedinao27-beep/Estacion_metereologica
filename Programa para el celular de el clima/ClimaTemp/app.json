@@ -1,0 +1,36 @@
+{
+  "expo": {
+    "name": "ClimaTemp",
+    "slug": "climatemp",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.climatemp.app"
+    },
+    "android": {
+      "package": "com.climatemp.app",
+      "adaptiveIcon": {
+        "backgroundColor": "#EAF2FE",
+        "foregroundImage": "./assets/android-icon-foreground.png",
+        "backgroundImage": "./assets/android-icon-background.png",
+        "monochromeImage": "./assets/android-icon-monochrome.png"
+      },
+      "predictiveBackGestureEnabled": false
+    },
+    "web": {
+      "bundler": "metro",
+      "favicon": "./assets/favicon.png"
+    },
+    "plugins": [
+      [
+        "expo-location",
+        {
+          "locationWhenInUsePermission": "ClimaTemp usa tu ubicación para mostrar la temperatura de donde estás."
+        }
+      ]
+    ]
+  }
+}
