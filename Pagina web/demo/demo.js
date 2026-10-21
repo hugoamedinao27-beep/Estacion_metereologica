@@ -354,7 +354,7 @@
     var readings = await loadReadings(MAX_READINGS);
     renderDashboard(readings[readings.length - 1]);
     renderLiveChart(readings.slice(-30));
-    renderHistory(readings.slice(-60));
+    renderHistory(readings.slice(-5));
   }
 
   /* ------------------------- formulario ------------------------- */

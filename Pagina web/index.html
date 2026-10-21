@@ -69,25 +69,31 @@
           </ul>
         </div>
 
-        <div class="hero-card" aria-hidden="true">
+        <div class="hero-card" id="homeGeoCard">
           <div class="hero-card-top">
-            <span class="status-dot status-normal"></span>
-            <span class="hero-card-title">Estado: Normal</span>
+            <span class="status-dot status-normal" id="homeGeoDot"></span>
+            <span class="hero-card-title">Clima en tu ubicación</span>
           </div>
+          <p style="margin:0.6rem 0 0.8rem; color:var(--color-text-muted); font-size:0.9rem;" id="homeGeoLoc">Obteniendo ubicación...</p>
           <div class="hero-metrics">
             <div class="metric">
-              <span class="metric-value">22<small>°C</small></span>
+              <span class="metric-value" id="homeGeoTemp">--<small>°C</small></span>
               <span class="metric-label">Temperatura</span>
             </div>
             <div class="metric">
-              <span class="metric-value">54<small>%</small></span>
+              <span class="metric-value" id="homeGeoHum">--<small>%</small></span>
               <span class="metric-label">Humedad</span>
             </div>
           </div>
           <div class="hero-card-row">
-            <span>Última lectura</span>
-            <span class="pill pill-off">Sensor DHT22 · simulado</span>
+            <span>Sensación térmica</span>
+            <span class="pill pill-off" id="homeGeoFeels">-- °C</span>
           </div>
+          <div class="hero-card-row" style="margin-top:0.5rem;">
+            <span>Fuente</span>
+            <span class="pill pill-off">GPS + Open-Meteo</span>
+          </div>
+          <p class="live-note" id="homeGeoNote" style="margin-top:0.8rem;">Usando tu ubicación para mostrar clima actual</p>
         </div>
       </div>
     </section>
@@ -156,10 +162,9 @@
         <header class="section-head">
           <p class="eyebrow">Registro de lecturas</p>
           <h2>Historial y gráficos</h2>
-          <p class="section-intro">
-            Últimas lecturas almacenadas (máximo 120). El gráfico muestra temperatura y humedad
-            en el tiempo.
-          </p>
+        <p class="section-intro">
+          Últimas <strong>5 actualizaciones</strong> del sensor simulado. El gráfico muestra la tendencia más reciente.
+        </p>
         </header>
 
         <div class="alert alert-info" id="historyEmpty" role="status" hidden>

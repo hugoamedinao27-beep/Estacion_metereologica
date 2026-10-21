@@ -131,3 +131,59 @@
     if(d){ render(d); if(btn) btn.textContent = "Actualizar ubicación"; }
   });
 })();
+// Home geo
+(function(){
+  "use strict";
+  var NOMINATIM_URL = "https://nominatim.openstreetmap.org/reverse";
+  var FORECAST_URL = "https://api.open-meteo.com/v1/forecast";
+  var locEl = document.getElementById("homeGeoLoc");
+  var tempEl = document.getElementById("homeGeoTemp");
+  var humEl = document.getElementById("homeGeoHum");
+  var feelsEl = document.getElementById("homeGeoFeels");
+  var noteEl = document.getElementById("homeGeoNote");
+  var card = document.getElementById("homeGeoCard");
+
+  async function getPlace(lat,lng){
+    try{
+      var u=NOMINATIM_URL+"?format=json&lat="+lat+"&lon="+lng+"&zoom=18&addressdetails=1&accept-language=es";
+      var r=await fetch(u);
+      if(!r.ok) throw new Error();
+      var j=await r.json(); var a=j.address||{};
+      var p=a.city||a.town||a.village||a.municipality||a.hamlet||a.county||(j.display_name||"").split(",")[0];
+      if(a.country) p+=", "+a.country;
+      return p|| (lat.toFixed(3)+", "+lng.toFixed(3));
+    }catch(e){return (lat.toFixed(3)+", "+lng.toFixed(3));}
+  }
+  async function getWx(lat,lng){
+    var u=FORECAST_URL+"?latitude="+lat+"&longitude="+lng+"&current=temperature_2m,relative_humidity_2m,apparent_temperature,weather_code&timezone=auto";
+    var r=await fetch(u); if(!r.ok) throw new Error(); return r.json();
+  }
+  function render(d){ if(!d) return;
+    if(locEl) locEl.textContent = d.place||"Tu ubicación";
+    if(tempEl) tempEl.innerHTML = Math.round(d.temp)+"<small>°C</small>";
+    if(humEl) humEl.innerHTML = d.hum+"<small>%</small>";
+    if(feelsEl) feelsEl.textContent = Math.round(d.feels)+" °C";
+    if(noteEl) noteEl.textContent = "Actualizado: "+new Date(d.updated).toLocaleTimeString("es-CL",{hour12:false});
+  }
+  function run(){
+    if(!navigator.geolocation){ if(noteEl) noteEl.textContent="Geolocalización no soportada"; return; }
+    if(noteEl) noteEl.textContent="Obteniendo ubicación...";
+    navigator.geolocation.getCurrentPosition(async p=>{
+      try{
+        var lat=p.coords.latitude,lng=p.coords.longitude;
+        var pl=await getPlace(lat,lng);
+        var w=await getWx(lat,lng);
+        var c=w.current;
+        var data={place:pl,temp:c.temperature_2m,hum:c.relative_humidity_2m,feels:c.apparent_temperature,updated:Date.now()};
+        render(data);
+        try{ localStorage.setItem("meteoguard_home_geo", JSON.stringify(data)); }catch(e){}
+      }catch(e){ if(noteEl) noteEl.textContent="No se pudo obtener clima de tu ubicación"; }
+    }, err=>{
+      if(noteEl) noteEl.textContent=(err.code===1?"Permiso denegado":"GPS no disponible");
+    }, {enableHighAccuracy:true,timeout:8000,maximumAge:0});
+  }
+  document.addEventListener("DOMContentLoaded", function(){
+    try{ var s=JSON.parse(localStorage.getItem("meteoguard_home_geo")); if(s){ render(s); } }catch(e){}
+    run();
+  });
+})();
