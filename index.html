@@ -36,6 +36,7 @@
           <li><a href="#inicio">Inicio</a></li>
           <li><a href="#dashboard">Dashboard</a></li>
           <li><a href="#historial">Historial</a></li>
+          <li><a href="#clima-ciudad">Clima por ciudad</a></li>
           <li><a href="#configuracion">Configuración</a></li>
           <li><a href="#arquitectura">Arquitectura</a></li>
         </ul>
@@ -255,6 +256,77 @@
       </div>
     </section>
 
+    <!-- CLIMA POR CIUDAD -->
+    <section class="section section-soft" id="clima-ciudad">
+      <div class="container">
+        <header class="section-head">
+          <p class="eyebrow">Clima en tiempo real</p>
+          <h2>Clima por ciudad</h2>
+          <p class="section-intro">
+            Consulta el clima actual y el pronóstico para los próximos 5 días de cualquier ciudad
+            del mundo. Usa <strong>Open-Meteo</strong> (sin API key, solo con tu navegador).
+          </p>
+        </header>
+
+        <div class="alert" id="weatherMessage" role="status" hidden></div>
+
+        <form id="weatherForm" class="search-bar" autocomplete="off">
+          <input id="cityInput" type="search" placeholder="Buscar ciudad (ej. Santiago de Chile, Madrid, Lima, Buenos Aires)" aria-label="Nombre de la ciudad" spellcheck="false" />
+          <button type="submit" class="btn btn-primary">Buscar</button>
+        </form>
+
+        <div class="suggestions" id="citySuggestions">
+          <span>Sugerencias:</span>
+          <button type="button" data-city="Santiago de Chile">Santiago de Chile</button>
+          <button type="button" data-city="Valparaíso, Chile">Valparaíso</button>
+          <button type="button" data-city="Concepción, Chile">Concepción</button>
+          <button type="button" data-city="Buenos Aires, Argentina">Buenos Aires</button>
+          <button type="button" data-city="Madrid, España">Madrid</button>
+          <button type="button" data-city="Lima, Perú">Lima</button>
+          <button type="button" data-city="Bogotá, Colombia">Bogotá</button>
+        </div>
+
+        <article class="weather-card" id="currentWeather" hidden>
+          <div class="weather-card-header">
+            <div>
+              <h3 id="weatherLocation">Ciudad</h3>
+              <p id="weatherTime">Actualizado —</p>
+            </div>
+            <div class="weather-main">
+              <span class="weather-icon" id="weatherIcon" aria-hidden="true">☀️</span>
+              <div>
+                <span class="weather-temp" id="weatherTemp">--°</span>
+                <span class="weather-desc" id="weatherDesc">—</span>
+              </div>
+            </div>
+          </div>
+          <div class="weather-grid">
+            <div class="weather-stat">
+              <span class="stat-label">Sensación térmica</span>
+              <span class="stat-value" id="weatherFeels">-- °C</span>
+            </div>
+            <div class="weather-stat">
+              <span class="stat-label">Humedad</span>
+              <span class="stat-value" id="weatherHumidity">-- %</span>
+            </div>
+            <div class="weather-stat">
+              <span class="stat-label">Viento</span>
+              <span class="stat-value" id="weatherWind">-- km/h</span>
+            </div>
+          </div>
+        </article>
+
+        <div>
+          <h3 class="forecast-title" id="forecastTitle" hidden>Pronóstico para los próximos 5 días</h3>
+          <div class="forecast-grid" id="forecastGrid"></div>
+        </div>
+
+        <p class="weather-source" id="weatherSource" hidden>
+          Datos proporcionados por <a href="https://open-meteo.com/es" target="_blank" rel="noopener noreferrer">Open-Meteo</a> • Geocoding + Forecast (sin API Key)
+        </p>
+      </div>
+    </section>
+
     <!-- ARQUITECTURA -->
     <section class="section section-accent" id="arquitectura">
       <div class="container">
@@ -308,5 +380,6 @@
 
   <script src="wwwroot/js/site.js" defer></script>
   <script src="demo/demo.js" defer></script>
+  <script src="demo/weather.js" defer></script>
 </body>
 </html>
