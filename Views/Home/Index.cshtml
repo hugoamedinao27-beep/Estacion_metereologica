@@ -1,0 +1,244 @@
+﻿@{
+    ViewData["Title"] = "Inicio";
+}
+
+<!-- HERO -->
+<section class="hero" id="inicio">
+  <div class="container hero-inner">
+    <div class="hero-content">
+      <p class="eyebrow">Internet de las Cosas · Monitoreo meteorológico</p>
+      <h1>Clima en tiempo real, decidido con datos</h1>
+      <p class="lead">
+        <strong>MeteoGuard</strong> es una estación meteorológica IoT que mide
+        <strong>temperatura y humedad</strong>, clasifica el ambiente en estados de alerta
+        y permite configurar los umbrales desde la web — con historial y gráficos.
+      </p>
+      <div class="hero-actions">
+        <a class="btn btn-primary" asp-controller="Dashboard" asp-action="Index">Ver dashboard en vivo</a>
+        <a class="btn btn-ghost" asp-controller="Home" asp-action="Index" asp-fragment="arquitectura">Cómo funciona</a>
+      </div>
+      <ul class="hero-badges" aria-label="Características destacadas">
+        <li>Datos en vivo (simulados)</li>
+        <li>Alertas configurables</li>
+        <li>Historial y gráficos</li>
+        <li>Desplegado en Azure</li>
+      </ul>
+    </div>
+
+    <div class="hero-card" aria-hidden="true">
+      <div class="hero-card-top">
+        <span class="status-dot status-normal"></span>
+        <span class="hero-card-title">Estado: Normal</span>
+      </div>
+      <div class="hero-metrics">
+        <div class="metric">
+          <span class="metric-value">22<small>°C</small></span>
+          <span class="metric-label">Temperatura</span>
+        </div>
+        <div class="metric">
+          <span class="metric-value">54<small>%</small></span>
+          <span class="metric-label">Humedad</span>
+        </div>
+      </div>
+      <div class="hero-card-row">
+        <span>Última lectura</span>
+        <span class="pill pill-off">Sensor DHT22 · simulado</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PROBLEMÁTICA -->
+<section class="section" id="problematica">
+  <div class="container">
+    <header class="section-head">
+      <p class="eyebrow">El problema</p>
+      <h2>El clima cambia y casi nadie lo mide</h2>
+      <p class="section-intro">
+        Invernaderos, bodegas, viviendas y espacios agrícolas sufren variaciones de
+        temperatura y humedad que pasan desapercibidas. Sin monitoreo continuo no hay
+        forma de anticipar heladas, golpes de calor en cultivos o niveles de humedad
+        que dañan productos y equipos.
+      </p>
+    </header>
+
+    <div class="grid grid-2">
+      <article class="card">
+        <h3>Falta de medición continua</h3>
+        <p>
+          Las mediciones manuales son puntuales: registran un instante y dejan semanas
+          sin datos que expliquen qué ocurrió.
+        </p>
+      </article>
+      <article class="card">
+        <h3>Respuesta tardía</h3>
+        <p>
+          Cuando alguien detecta el problema de forma visual, el daño (helada, calor
+          extremo, humedad excesiva) ya ocurrió. Se necesita alertar a tiempo.
+        </p>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- CÓMO FUNCIONA / ARQUITECTURA -->
+<section class="section section-accent" id="arquitectura">
+  <div class="container">
+    <header class="section-head">
+      <p class="eyebrow eyebrow-invert">Arquitectura implementada</p>
+      <h2>Cómo funciona: MVC + Firebase + Azure</h2>
+      <p class="section-intro intro-invert">
+        La solución usa <strong>patrón MVC</strong> sobre ASP.NET Core. Una solicitud
+        viaja desde el navegador hasta la base de datos y vuelve como interfaz:
+      </p>
+    </header>
+
+    <ol class="steps">
+      <li class="step">
+        <span class="step-index">1</span>
+        <h3>Vista (View)</h3>
+        <p>El navegador solicita una página (Razor) o un endpoint JSON y muestra los datos con Chart.js.</p>
+      </li>
+      <li class="step">
+        <span class="step-index">2</span>
+        <h3>Controlador (Controller)</h3>
+        <p>Recibe la solicitud, valida parámetros y coordina a los servicios para preparar la respuesta.</p>
+      </li>
+      <li class="step">
+        <span class="step-index">3</span>
+        <h3>Modelo y servicios</h3>
+        <p><strong>AlertCalculator</strong> aplica las reglas de negocio y <strong>FirebaseService</strong> accede a los datos vía API REST.</p>
+      </li>
+      <li class="step">
+        <span class="step-index">4</span>
+        <h3>Datos en la nube</h3>
+        <p><strong>Firebase Realtime Database</strong> persiste lecturas y umbrales; un <strong>BackgroundService</strong> simula el sensor.</p>
+      </li>
+    </ol>
+
+    <div class="components">
+      <h3 class="components-title">Componentes y responsabilidades</h3>
+      <div class="grid grid-4">
+        <article class="chip-card">
+          <h4>Vistas Razor + JS</h4>
+          <p>Interfaz, formulario de umbrales, gráficos y polling en vivo.</p>
+        </article>
+        <article class="chip-card">
+          <h4>Controllers</h4>
+          <p>Home, Dashboard, History y Settings: coordinan cada flujo.</p>
+        </article>
+        <article class="chip-card">
+          <h4>Modelo / reglas</h4>
+          <p>Reading, ThresholdConfig y la máquina de estados de alerta.</p>
+        </article>
+        <article class="chip-card">
+          <h4>Servicios cloud</h4>
+          <p>Azure App Service ejecuta la app; Firebase persiste los datos.</p>
+        </article>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ESTADOS DE ALERTA -->
+<section class="section section-soft" id="estados">
+  <div class="container">
+    <header class="section-head">
+      <p class="eyebrow">Lógica de negocio</p>
+      <h2>Estados de alerta</h2>
+      <p class="section-intro">
+        El <code>AlertCalculator</code> clasifica cada lectura según los umbrales
+        configurables (valores por defecto de la tabla). Los umbrales pueden
+        modificarse desde <a asp-controller="Settings" asp-action="Index">Configuración</a>.
+      </p>
+    </header>
+
+    <div class="table-wrap">
+      <table class="state-table">
+        <caption class="visually-hidden">Estados de alerta, rangos de temperatura y respuesta del sistema</caption>
+        <thead>
+          <tr>
+            <th scope="col">Estado</th>
+            <th scope="col">Rango de temperatura</th>
+            <th scope="col">Acción / aviso</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <th scope="row"><span class="tag tag-cold">Frío</span></th>
+            <td>Menos de 15 °C</td>
+            <td>Notificación de baja temperatura</td>
+          </tr>
+          <tr>
+            <th scope="row"><span class="tag tag-normal">Normal</span></th>
+            <td>Entre 15 °C y 24 °C</td>
+            <td>Registro de datos de rutina</td>
+          </tr>
+          <tr>
+            <th scope="row"><span class="tag tag-warn">Precaución</span></th>
+            <td>Desde 25 °C</td>
+            <td>Notificación preventiva</td>
+          </tr>
+          <tr>
+            <th scope="row"><span class="tag tag-hot">Calor</span></th>
+            <td>Desde 28 °C</td>
+            <td>Alerta en el dashboard</td>
+          </tr>
+          <tr>
+            <th scope="row"><span class="tag tag-critical">Crítico</span></th>
+            <td>Desde 30 °C</td>
+            <td>Alerta urgente en pantalla</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- FUTURO -->
+<section class="section" id="futuro">
+  <div class="container">
+    <header class="section-head">
+      <p class="eyebrow">Escalabilidad y trabajo futuro</p>
+      <h2>Hacia dónde puede crecer</h2>
+      <p class="section-intro">
+        El diseño desacoplado (interfaz, controladores, servicios y datos
+        independientes) permite reemplazar piezas sin reescribir el sistema completo.
+      </p>
+    </header>
+
+    <div class="grid grid-4">
+      <article class="card future-card">
+        <h3>Sensor real ESP32 + DHT22</h3>
+        <p>El microcontrolador enviaría las lecturas al mismo nodo <code>/readings</code> de Firebase por Wi-Fi.</p>
+      </article>
+      <article class="card future-card">
+        <h3>Firebase Auth</h3>
+        <p>Autenticar a los usuarios para que cada uno gestione su propia estación y umbrales.</p>
+      </article>
+      <article class="card future-card">
+        <h3>Notificaciones push</h3>
+        <p>Integrar Firebase Cloud Messaging para alertas móviles cuando se supera el umbral crítico.</p>
+      </article>
+      <article class="card future-card">
+        <h3>Varias estaciones</h3>
+        <p>Soportar múltiples sensores por usuario con un panel comparativo entre estaciones.</p>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- CONCLUSIÓN -->
+<section class="section section-accent conclusion" id="conclusion">
+  <div class="container conclusion-inner">
+    <h2>Conclusión</h2>
+    <p>
+      MeteoGuard demuestra cómo el patrón MVC separa interfaz, lógica de negocio y
+      persistencia, mientras los servicios cloud (Azure + Firebase) aportan despliegue
+      y datos en tiempo real sin administrar servidores. Cada pieza puede evolucionar
+      por separado: cambiar Firebase por Azure SQL, o el simulador por un sensor
+      físico, no afecta al resto del sistema.
+    </p>
+    <a class="btn btn-light" asp-controller="Dashboard" asp-action="Index">Explorar el dashboard</a>
+  </div>
+</section>

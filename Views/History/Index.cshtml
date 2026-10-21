@@ -1,0 +1,85 @@
+@model EstacionMeteorologica.Models.ViewModels.HistoryViewModel
+@{
+    ViewData["Title"] = "Historial";
+}
+
+<section class="section" id="historial">
+  <div class="container">
+    <header class="section-head">
+      <p class="eyebrow">Registro de lecturas</p>
+      <h2>Historial y gráficos</h2>
+      <p class="section-intro">
+        Últimas <strong>@Model.Readings.Count</strong> lecturas persistidas en Firebase
+        (máximo 120). El gráfico muestra la tendencia de temperatura y humedad.
+      </p>
+    </header>
+
+    @if (!Model.FirebaseConfigured)
+    {
+      <div class="alert alert-warning" role="alert">
+        <strong>Firebase no está configurado.</strong> No hay historial que mostrar.
+      </div>
+    }
+    else if (Model.Readings.Count == 0)
+    {
+      <div class="alert alert-info" role="status">
+        Aún no hay lecturas registradas. El sensor simulado las escribe cada pocos
+        segundos; espere un momento y recargue la página.
+      </div>
+    }
+    else
+    {
+      <article class="chart-card" style="margin-bottom:1.75rem;">
+        <h3 class="chart-title">Temperatura y humedad (últimas lecturas)</h3>
+        <div class="chart-wrap chart-wrap-tall">
+          <canvas id="historyChart" aria-label="Gráfico de historial" role="img"></canvas>
+        </div>
+      </article>
+
+      <div class="table-wrap">
+        <table class="state-table">
+          <caption class="visually-hidden">Historial de lecturas del sensor</caption>
+          <thead>
+            <tr>
+              <th scope="col">Hora</th>
+              <th scope="col">Temperatura</th>
+              <th scope="col">Humedad</th>
+              <th scope="col">Estado</th>
+            </tr>
+          </thead>
+          <tbody>
+            @foreach (var r in Model.Readings.AsEnumerable().Reverse())
+            {
+              <tr>
+                <td>@r.Timestamp.ToLocalTime().ToString("dd/MM HH:mm:ss")</td>
+                <td>@r.Temperature.ToString("0.0") °C</td>
+                <td>@r.Humidity.ToString("0") %</td>
+                <td><span class="tag tag-@StateCss(r.State)">@r.State</span></td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  </div>
+</section>
+
+@functions {
+    string StateCss(EstacionMeteorologica.Models.AlertState state) => state switch
+    {
+        EstacionMeteorologica.Models.AlertState.Frio => "cold",
+        EstacionMeteorologica.Models.AlertState.Precaucion => "warn",
+        EstacionMeteorologica.Models.AlertState.Calor => "hot",
+        EstacionMeteorologica.Models.AlertState.Critico => "critical",
+        _ => "normal"
+    };
+}
+
+@section Scripts {
+  <script>
+    window.__historyData = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(
+        Model.Readings.Select(r => new { r.Temperature, r.Humidity, t = r.Timestamp.ToLocalTime().ToString("HH:mm:ss") }),
+        new System.Text.Json.JsonSerializerOptions { PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase }));
+  </script>
+  <script src="~/js/history.js" defer></script>
+}

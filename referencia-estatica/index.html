@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="PetGuard (PetSafe IoT): sistema de monitoreo ambiental autónomo que protege a las mascotas que pasan el día solas en casa." />
+  <meta name="theme-color" content="#2563eb" />
+  <title>PetGuard · PetSafe IoT — Bienestar de las mascotas, monitoreado en tiempo real</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='48' fill='%232563eb'/%3E%3Ctext x='50' y='68' font-size='58' text-anchor='middle' fill='white' font-family='sans-serif'%3EP%3C/text%3E%3C/svg%3E" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+  <a class="skip-link" href="#inicio">Saltar al contenido principal</a>
+
+  <header class="site-header">
+    <div class="container header-inner">
+      <a class="brand" href="#inicio" aria-label="PetGuard, ir al inicio">
+        <span class="brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 21s-6.5-4.35-9.2-8.38C.9 9.62 2.2 6 5.5 6c2 0 3.2 1.2 4 2.2.8-1 2-2.2 4-2.2 3.3 0 4.6 3.62 2.7 6.62C18.5 16.65 12 21 12 21z"/>
+            <path d="M9 6.5 7 3M15 6.5 17 3"/>
+          </svg>
+        </span>
+        <span class="brand-text">PetGuard</span>
+      </a>
+
+      <button class="nav-toggle" id="navToggle" aria-expanded="false" aria-controls="primaryNav" aria-label="Abrir menú de navegación">
+        <span class="nav-toggle-bar"></span>
+        <span class="nav-toggle-bar"></span>
+        <span class="nav-toggle-bar"></span>
+      </button>
+
+      <nav class="primary-nav" id="primaryNav" aria-label="Navegación principal">
+        <ul>
+          <li><a href="#inicio">Inicio</a></li>
+          <li><a href="#problematica">Problemática</a></li>
+          <li><a href="#ayudar">Cómo ayudamos</a></li>
+          <li><a href="#funcionamiento">Funcionamiento</a></li>
+          <li><a href="#estados">Estados de alerta</a></li>
+          <li><a href="#app">App móvil</a></li>
+          <li><a href="#futuro">Futuro</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+
+    <!-- HERO -->
+    <section class="hero" id="inicio">
+      <div class="container hero-inner">
+        <div class="hero-content">
+          <p class="eyebrow">Internet de las Cosas · Bienestar animal</p>
+          <h1>Bienestar de las mascotas, monitoreado en tiempo real</h1>
+          <p class="lead">
+            <strong>PetGuard</strong> es el sistema <strong>PetSafe IoT</strong>: un dispositivo de
+            monitoreo ambiental autónomo diseñado para proteger a las mascotas que permanecen
+            solas en casa durante jornadas de trabajo o estudio.
+          </p>
+          <div class="hero-actions">
+            <a class="btn btn-primary" href="#ayudar">Cómo queremos ayudar</a>
+            <a class="btn btn-ghost" href="#funcionamiento">Ver cómo funciona</a>
+          </div>
+          <ul class="hero-badges" aria-label="Características destacadas">
+            <li>Monitoreo continuo</li>
+            <li>Actuación automática</li>
+            <li>Opera sin depender del Wi-Fi</li>
+          </ul>
+        </div>
+
+        <div class="hero-card" aria-hidden="true">
+          <div class="hero-card-top">
+            <span class="status-dot status-normal"></span>
+            <span class="hero-card-title">Estado: Normal</span>
+          </div>
+          <div class="hero-metrics">
+            <div class="metric">
+              <span class="metric-value">22<small>°C</small></span>
+              <span class="metric-label">Temperatura</span>
+            </div>
+            <div class="metric">
+              <span class="metric-value">54<small>%</small></span>
+              <span class="metric-label">Humedad</span>
+            </div>
+          </div>
+          <div class="hero-card-row">
+            <span>Ventilador</span>
+            <span class="pill pill-off">Apagado · Automático</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- PROBLEMÁTICA -->
+    <section class="section" id="problematica">
+      <div class="container">
+        <header class="section-head">
+          <p class="eyebrow">El problema</p>
+          <h2>Una realidad que queremos cambiar</h2>
+          <p class="section-intro">
+            Miles de mascotas pasan gran parte del día solas en habitaciones o departamentos.
+            Durante ese tiempo, variables como el aumento drástico de la temperatura por
+            radiación solar directa o una ventilación inadecuada pueden provocar golpes de calor
+            o estrés térmico.
+          </p>
+        </header>
+
+        <div class="grid grid-2">
+          <article class="card">
+            <h3>Falta de visibilidad</h3>
+            <p>
+              Mientras el propietario está ausente, desconoce por completo cómo evoluciona el
+              clima dentro de la vivienda.
+            </p>
+          </article>
+          <article class="card">
+            <h3>Incapacidad de respuesta</h3>
+            <p>
+              Si las condiciones se vuelven desfavorables, sin dispositivos automatizados el
+              propietario no puede actuar a distancia.
+            </p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- CÓMO QUEREMOS AYUDAR (sección destacada) -->
+    <section class="section section-accent" id="ayudar">
+      <div class="container">
+        <header class="section-head">
+          <p class="eyebrow eyebrow-invert">Nuestro propósito</p>
+          <h2>Cómo queremos ayudar</h2>
+          <p class="section-intro intro-invert">
+            PetGuard nace con una intención sencilla y altruista: que ninguna mascota pase un
+            mal momento por un riesgo ambiental que podía evitarse. No buscamos solo medir
+            datos, queremos <strong>cuidar</strong>.
+          </p>
+        </header>
+
+        <blockquote class="mission-quote">
+          “PetSafe IoT es una herramienta de prevención y mitigación que cierra la brecha
+          entre la detección de un riesgo ambiental y la respuesta técnica inmediata.”
+        </blockquote>
+
+        <div class="grid grid-3">
+          <article class="card card-invert">
+            <h3>Prevenir antes que lamentar</h3>
+            <p>
+              Actuamos de forma anticipada: cuando el ambiente supera un límite seguro, el
+              sistema enciende la ventilación por sí solo.
+            </p>
+          </article>
+          <article class="card card-invert">
+            <h3>Proteger sin interrupciones</h3>
+            <p>
+              La lógica local es prioritaria: el cuidado continúa incluso si la red Wi-Fi
+              falla o se interrumpe.
+            </p>
+          </article>
+          <article class="card card-invert">
+            <h3>Dar tranquilidad</h3>
+            <p>
+              Los dueños pueden estar fuera con la confianza de que su mascota está
+              acompañada por un sistema que responde.
+            </p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- FUNCIONAMIENTO / ARQUITECTURA -->
+    <section class="section" id="funcionamiento">
+      <div class="container">
+        <header class="section-head">
+          <p class="eyebrow">Arquitectura general</p>
+          <h2>Cómo funciona</h2>
+          <p class="section-intro">
+            El sistema se organiza en cuatro fases operativas que van desde la lectura del
+            ambiente hasta el aviso al usuario.
+          </p>
+        </header>
+
+        <ol class="steps">
+          <li class="step">
+            <span class="step-index">1</span>
+            <h3>Captura</h3>
+            <p>Un sensor <strong>DHT22</strong> mide con precisión la temperatura y la humedad relativa del entorno.</p>
+          </li>
+          <li class="step">
+            <span class="step-index">2</span>
+            <h3>Procesamiento y decisión</h3>
+            <p>El microcontrolador <strong>ESP32</strong> analiza los datos y decide de forma automatizada según los umbrales definidos.</p>
+          </li>
+          <li class="step">
+            <span class="step-index">3</span>
+            <h3>Actuación local</h3>
+            <p>Un <strong>ventilador</strong> de corriente continua se activa mediante MOSFET o relé, y una pantalla local muestra las lecturas en vivo.</p>
+          </li>
+          <li class="step">
+            <span class="step-index">4</span>
+            <h3>Notificación remota</h3>
+            <p>La <strong>app móvil</strong> permite ver el estado, recibir alertas y configurar los parámetros de control.</p>
+          </li>
+        </ol>
+
+        <div class="components">
+          <h3 class="components-title">Componentes principales</h3>
+          <div class="grid grid-4">
+            <article class="chip-card">
+              <h4>Sensor DHT22</h4>
+              <p>Temperatura y humedad relativa.</p>
+            </article>
+            <article class="chip-card">
+              <h4>Microcontrolador ESP32</h4>
+              <p>Decisión automática y conectividad Wi-Fi.</p>
+            </article>
+            <article class="chip-card">
+              <h4>Pantalla OLED / LCD</h4>
+              <p>Lecturas en tiempo real en el dispositivo.</p>
+            </article>
+            <article class="chip-card">
+              <h4>Ventilador DC</h4>
+              <p>Ventilación preventiva conmutada por relé o MOSFET.</p>
+            </article>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ESTADOS DE ALERTA -->
+    <section class="section section-soft" id="estados">
+      <div class="container">
+        <header class="section-head">
+          <p class="eyebrow">Lógica de control</p>
+          <h2>Estados de alerta</h2>
+          <p class="section-intro">
+            Para garantizar la seguridad de la mascota, el sistema gestiona una máquina de
+            estados con distintos niveles de criticidad. Cada estado combina una acción local
+            con un aviso al usuario.
+          </p>
+        </header>
+
+        <div class="table-wrap">
+          <table class="state-table">
+            <caption class="visually-hidden">Estados de alerta, rangos de temperatura, acción local y acción en celular</caption>
+            <thead>
+              <tr>
+                <th scope="col">Estado</th>
+                <th scope="col">Rango de temperatura</th>
+                <th scope="col">Acción local</th>
+                <th scope="col">Acción en celular / red</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <th scope="row"><span class="tag tag-normal">Normal</span></th>
+                <td>18 °C – 24 °C</td>
+                <td>Solo monitoreo continuo</td>
+                <td>Registro de datos de rutina</td>
+              </tr>
+              <tr>
+                <th scope="row"><span class="tag tag-warn">Precaución</span></th>
+                <td>25 °C – 27 °C</td>
+                <td>Prepara la activación</td>
+                <td>Notificación preventiva</td>
+              </tr>
+              <tr>
+                <th scope="row"><span class="tag tag-hot">Calor</span></th>
+                <td>28 °C – 30 °C</td>
+                <td>Encendido del ventilador</td>
+                <td>Alerta push en la aplicación</td>
+              </tr>
+              <tr>
+                <th scope="row"><span class="tag tag-critical">Crítico</span></th>
+                <td>Más de 30 °C</td>
+                <td>Ventilador a máxima potencia</td>
+                <td>Alerta urgente sonora y push</td>
+              </tr>
+              <tr>
+                <th scope="row"><span class="tag tag-cold">Frío</span></th>
+                <td>Menos de 15 °C</td>
+                <td>Apagado de la ventilación</td>
+                <td>Notificación de baja temperatura</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- APP MÓVIL -->
+    <section class="section" id="app">
+      <div class="container">
+        <header class="section-head">
+          <p class="eyebrow">Aplicación móvil</p>
+          <h2>La mascota, en tus manos</h2>
+          <p class="section-intro">
+            La aplicación es la interfaz del usuario: permite monitorear, recibir alertas y
+            realizar configuraciones remotas, siempre sin entrar en detalles técnicos.
+          </p>
+        </header>
+
+        <div class="grid grid-3">
+          <article class="card app-card">
+            <h3>Panel principal</h3>
+            <p>
+              Una tarjeta superior cambia de color según el estado del ambiente
+              (verde: normal, amarillo: precaución, rojo: crítico).
+            </p>
+            <ul class="tick-list">
+              <li>Indicador circular de temperatura.</li>
+              <li>Indicador circular de humedad.</li>
+              <li>Estado del ventilador (encendido o apagado, en modo automático).</li>
+              <li>Última actualización de los datos recibidos.</li>
+            </ul>
+          </article>
+          <article class="card app-card">
+            <h3>Historial y gráficos</h3>
+            <p>
+              Un gráfico de líneas interactivo muestra la tendencia de temperatura y humedad
+              de las últimas 24 horas.
+            </p>
+            <ul class="tick-list">
+              <li>Registro de eventos con hora de cada cambio.</li>
+              <li>Ejemplo: “14:30 hs · ventilador activado por 28,5 °C”.</li>
+            </ul>
+          </article>
+          <article class="card app-card">
+            <h3>Configuración</h3>
+            <p>
+              El usuario ajusta los límites de activación sin conocimientos técnicos.
+            </p>
+            <ul class="tick-list">
+              <li>Umbral de encendido del ventilador (25 °C – 32 °C).</li>
+              <li>Umbral de alerta por temperatura baja.</li>
+              <li>Control automático o manual del ventilador.</li>
+            </ul>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- PROTOTIPO -->
+    <section class="section section-soft" id="prototipo">
+      <div class="container prototype-inner">
+        <div class="prototype-text">
+          <p class="eyebrow">Validación</p>
+          <h2>Un prototipo a escala real</h2>
+          <p>
+            Para comprobar el funcionamiento del proyecto, se construye una maqueta a escala
+            de una habitación residencial: una caja que simula las paredes y la ventana, con
+            el ventilador instalado a un costado imitando una ventilación de pared.
+          </p>
+          <p>
+            La caja principal, con su pantalla, se ubica fuera de la maqueta para facilitar su
+            lectura, mientras que el sensor se extiende hacia el interior de la habitación
+            para medir las condiciones reales del ambiente.
+          </p>
+        </div>
+        <ul class="prototype-list">
+          <li>Simula una habitación de 30 × 30 × 30 cm.</li>
+          <li>Ventilador de extracción en el lateral.</li>
+          <li>Pantalla legible en el exterior.</li>
+          <li>Sensor midiendo dentro de la habitación.</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- FUTURO -->
+    <section class="section" id="futuro">
+      <div class="container">
+        <header class="section-head">
+          <p class="eyebrow">Escalabilidad y trabajo futuro</p>
+          <h2>Hacia dónde puede crecer</h2>
+          <p class="section-intro">
+            El diseño modular de PetSafe IoT permite ampliar sus capacidades en futuras
+            versiones, siempre con el bienestar de la mascota como objetivo.
+          </p>
+        </header>
+
+        <div class="grid grid-4">
+          <article class="card future-card">
+            <h3>Control IR</h3>
+            <p>Un emisor infrarrojo para operar aires acondicionados o estufas comerciales sin modificar sus cables.</p>
+          </article>
+          <article class="card future-card">
+            <h3>Nivel de agua</h3>
+            <p>Un sensor ultrasónico o capacitivo en el bebedero que alerta cuando falta agua.</p>
+          </article>
+          <article class="card future-card">
+            <h3>Módulo de cámara</h3>
+            <p>Una cámara ESP32-CAM para la verificación visual a petición del usuario.</p>
+          </article>
+          <article class="card future-card">
+            <h3>Enchufes inteligentes</h3>
+            <p>Conexión mediante protocolo Zigbee o Wi-Fi con relés externos.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- CONCLUSIÓN -->
+    <section class="section section-accent conclusion" id="conclusion">
+      <div class="container conclusion-inner">
+        <h2>Conclusión</h2>
+        <p>
+          PetSafe IoT demuestra cómo la tecnología de Internet de las Cosas aplicada a baja
+          escala puede resolver problemas cotidianos significativos. Gracias a su lógica de
+          control local descentralizada, garantiza la continuidad operativa frente a fallas
+          de conectividad, asegurando la mitigación del riesgo ambiental para las mascotas y
+          brindando tranquilidad a sus dueños.
+        </p>
+        <a class="btn btn-light" href="#inicio">Volver al inicio</a>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <div class="footer-brand">
+        <span class="brand-text">PetGuard</span>
+        <p>Sistema PetSafe IoT · Monitoreo ambiental para el bienestar de las mascotas.</p>
+      </div>
+      <div class="footer-meta">
+        <p class="footer-label">Proyecto académico</p>
+        <p>Asignatura: Internet de las Cosas</p>
+        <p>Daniel Madrid · Diego Oyarzo · Nicolás Díaz · Hugo Medina</p>
+        <p>Docente: Osvaldo Archile</p>
+      </div>
+    </div>
+    <div class="container footer-bottom">
+      <p>© 2026 PetGuard · PetSafe IoT. Página informativa.</p>
+    </div>
+  </footer>
+
+  <script src="script.js" defer></script>
+</body>
+</html>
