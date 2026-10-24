@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <color name="splashBackground">#F4F8FF</color>
-    <color name="brandBlue">#1F6FEB</color>
-    <color name="statusBar">#F4F8FF</color>
-    <color name="navBar">#FFFFFF</color>
-</resources>
