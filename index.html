@@ -1,13 +1,13 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" data-theme="dark">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="MeteoGuard: demo estática de una estación meteorológica IoT con dashboard en vivo, alertas configurables e historial." />
-  <meta name="theme-color" content="#2563eb" />
-  <title>MeteoGuard · Estación Meteorológica IoT — Demo</title>
+  <meta name="description" content="MeteoGuard: Sistema de monitoreo meteorológico IoT con arquitectura MVC, dashboard en vivo, alertas configurables y API Open-Meteo." />
+  <meta name="theme-color" content="#0f172a" />
+  <title>MeteoGuard · Estación Meteorológica IoT (MVC)</title>
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='48' fill='%232563eb'/%3E%3Ctext x='50' y='68' font-size='58' text-anchor='middle' fill='white' font-family='sans-serif'%3EM%3C/text%3E%3C/svg%3E" />
-  <link rel="stylesheet" href="wwwroot/css/styles.css" />
+  <link rel="stylesheet" href="css/styles.css" />
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js" defer></script>
 </head>
 <body>
@@ -23,13 +23,21 @@
           </svg>
         </span>
         <span class="brand-text">MeteoGuard</span>
+        <span class="live-badge"><span class="pulse-dot"></span> IoT Activo</span>
       </a>
 
-      <button class="nav-toggle" id="navToggle" aria-expanded="false" aria-controls="primaryNav" aria-label="Abrir menú de navegación">
-        <span class="nav-toggle-bar"></span>
-        <span class="nav-toggle-bar"></span>
-        <span class="nav-toggle-bar"></span>
-      </button>
+      <div class="header-controls">
+        <button type="button" class="theme-toggle" id="themeToggle" aria-label="Cambiar entre modo oscuro y claro" title="Cambiar tema visual">
+          <span class="theme-icon" id="themeIcon" aria-hidden="true">☀️</span>
+          <span class="theme-label" id="themeLabel">Modo Claro</span>
+        </button>
+
+        <button class="nav-toggle" id="navToggle" aria-expanded="false" aria-controls="primaryNav" aria-label="Abrir menú de navegación">
+          <span class="nav-toggle-bar"></span>
+          <span class="nav-toggle-bar"></span>
+          <span class="nav-toggle-bar"></span>
+        </button>
+      </div>
 
       <nav class="primary-nav" id="primaryNav" aria-label="Navegación principal">
         <ul>
@@ -38,7 +46,7 @@
           <li><a href="#historial">Historial</a></li>
           <li><a href="#clima-ciudad">Clima por ciudad</a></li>
           <li><a href="#configuracion">Configuración</a></li>
-          <li><a href="#arquitectura">Arquitectura</a></li>
+          <li><a href="#arquitectura">Arquitectura MVC</a></li>
         </ul>
       </nav>
     </div>
@@ -46,59 +54,78 @@
 
   <main id="contenido">
 
-    <!-- HERO -->
+    <!-- HERO CON TARJETA GPS UNIFICADA -->
     <section class="hero" id="inicio">
       <div class="container hero-inner">
         <div class="hero-content">
-          <p class="eyebrow">Internet de las Cosas · Monitoreo meteorológico</p>
+          <p class="eyebrow">Temática N.º 7 · Monitoreo Meteorológico IoT</p>
           <h1>Clima en tiempo real, decidido con datos</h1>
           <p class="lead">
             <strong>MeteoGuard</strong> mide <strong>temperatura y humedad</strong>, clasifica el
-            ambiente en estados de alerta y permite configurar los umbrales — con historial y
-            gráficos. Esta es una <strong>demo estática</strong>: la simulación corre en el navegador.
+            ambiente en estados de alerta mediante su <strong>Modelo MVC</strong> y permite configurar
+            umbrales con historial, KPIs estadísticos y conexión directa a <strong>Open-Meteo</strong>.
           </p>
           <div class="hero-actions">
             <a class="btn btn-primary" href="#dashboard">Ver dashboard en vivo</a>
             <a class="btn btn-ghost" href="#configuracion">Configurar umbrales</a>
           </div>
           <ul class="hero-badges" aria-label="Características destacadas">
-            <li>Datos en vivo (simulados)</li>
-            <li>Alertas configurables</li>
-            <li>Historial y gráficos</li>
-            <li>Persistencia local o Firebase</li>
+            <li>Arquitectura MVC</li>
+            <li>Medidores y KPIs en vivo</li>
+            <li>Open-Meteo + GPS</li>
+            <li>Modo Oscuro / Claro</li>
           </ul>
         </div>
 
-        <div class="hero-card" id="homeGeoCard">
+        <!-- Tarjeta única de Clima por GPS -->
+        <div class="hero-card hero-card-gps" id="homeGeoCard">
           <div class="hero-card-top">
-            <span class="status-dot status-normal" id="homeGeoDot"></span>
-            <span class="hero-card-title">Clima en tu ubicación</span>
+            <div class="gps-header-left">
+              <span class="status-dot status-normal" id="homeGeoDot"></span>
+              <span class="hero-card-title">Clima GPS en tu ubicación</span>
+            </div>
+            <button type="button" class="btn-icon-refresh" id="homeGeoRefresh" title="Actualizar coordenadas GPS">
+              🔄 Actualizar
+            </button>
           </div>
-          <p style="margin:0.6rem 0 0.8rem; color:var(--color-text-muted); font-size:0.9rem;" id="homeGeoLoc">Obteniendo ubicación...</p>
+
+          <div class="gps-location-banner">
+            <div>
+              <p class="geo-loc-label" id="homeGeoLoc">📍 Obteniendo ubicación...</p>
+              <span class="geo-desc-label" id="homeGeoDesc">Sincronizando con satélite...</span>
+            </div>
+            <span class="geo-weather-emoji" id="homeGeoIcon" aria-hidden="true">🌡️</span>
+          </div>
+
           <div class="hero-metrics">
-            <div class="metric">
+            <div class="metric metric-temp">
               <span class="metric-value" id="homeGeoTemp">--<small>°C</small></span>
-              <span class="metric-label">Temperatura</span>
+              <span class="metric-label">🌡️ Temperatura</span>
             </div>
-            <div class="metric">
+            <div class="metric metric-hum">
               <span class="metric-value" id="homeGeoHum">--<small>%</small></span>
-              <span class="metric-label">Humedad</span>
+              <span class="metric-label">💧 Humedad</span>
             </div>
           </div>
+
           <div class="hero-card-row">
             <span>Sensación térmica</span>
-            <span class="pill pill-off" id="homeGeoFeels">-- °C</span>
+            <span class="pill pill-accent" id="homeGeoFeels">-- °C</span>
           </div>
           <div class="hero-card-row" style="margin-top:0.5rem;">
-            <span>Fuente</span>
-            <span class="pill pill-off">GPS + Open-Meteo</span>
+            <span>Velocidad del viento</span>
+            <span class="pill pill-wind" id="homeGeoWind">-- km/h</span>
           </div>
-          <p class="live-note" id="homeGeoNote" style="margin-top:0.8rem;">Usando tu ubicación para mostrar clima actual</p>
+          <div class="hero-card-row" style="margin-top:0.5rem;">
+            <span>Fuente de telemetría</span>
+            <span class="pill pill-off">GPS + Open-Meteo + Nominatim</span>
+          </div>
+          <p class="live-note" id="homeGeoNote" style="margin-top:0.75rem;">Usando tu ubicación para mostrar clima actual</p>
         </div>
       </div>
     </section>
 
-    <!-- DASHBOARD -->
+    <!-- DASHBOARD IOT -->
     <section class="section" id="dashboard">
       <div class="container">
         <header class="section-head">
@@ -106,8 +133,7 @@
           <h2>Dashboard de la estación</h2>
           <p class="section-intro">
             Cada <strong>8 segundos</strong> se genera una lectura simulada y cada
-            <strong>5 segundos</strong> se refresca la interfaz. La tarjeta y el gráfico se
-            actualizan automáticamente.
+            <strong>5 segundos</strong> se refresca la interfaz. Incluye medidores de nivel y cálculo de KPIs en tiempo real.
           </p>
         </header>
 
@@ -116,20 +142,30 @@
         </div>
 
         <div class="dashboard-grid">
-          <article class="hero-card" id="statusCard">
+          <!-- Tarjeta de Estado con Barras Medidoras y Botones de Simulación -->
+          <article class="hero-card state-card-normal" id="statusCard">
             <div class="hero-card-top">
               <span class="status-dot status-normal" id="statusDot"></span>
               <span class="hero-card-title">Estado: <span id="statusText">Cargando…</span></span>
             </div>
 
             <div class="hero-metrics">
-              <div class="metric">
+              <div class="metric metric-temp">
                 <span class="metric-value" id="tempValue">--<small>°C</small></span>
-                <span class="metric-label">Temperatura</span>
+                <span class="metric-label">🌡️ Temperatura</span>
+                <div class="gauge-track" aria-hidden="true">
+                  <div class="gauge-fill gauge-fill-temp" id="tempGaugeFill" style="width: 0%;"></div>
+                </div>
+                <span class="gauge-caption" id="tempGaugeLabel">0% del nivel crítico</span>
               </div>
-              <div class="metric">
+
+              <div class="metric metric-hum">
                 <span class="metric-value" id="humValue">--<small>%</small></span>
-                <span class="metric-label">Humedad</span>
+                <span class="metric-label">💧 Humedad</span>
+                <div class="gauge-track" aria-hidden="true">
+                  <div class="gauge-fill gauge-fill-hum" id="humGaugeFill" style="width: 0%;"></div>
+                </div>
+                <span class="gauge-caption" id="humGaugeLabel">Nivel de saturación</span>
               </div>
             </div>
 
@@ -138,20 +174,68 @@
               <span class="pill pill-off" id="lastUpdate">—</span>
             </div>
 
-            <div class="hero-card-row" style="margin-top:0.75rem;">
+            <div class="hero-card-row" style="margin-top:0.65rem;">
               <span>Umbral de calor</span>
-              <span class="pill pill-off" id="thresholdPill">28 °C</span>
+              <span class="pill pill-warm" id="thresholdPill">28 °C</span>
+            </div>
+
+            <div class="hero-card-row" style="margin-top:0.65rem;">
+              <span>Umbral crítico</span>
+              <span class="pill pill-crit" id="criticalPill">30 °C</span>
+            </div>
+
+            <div class="sim-controls">
+              <span class="sim-controls-title">Simular lectura ahora:</span>
+              <div class="sim-buttons" id="simButtons">
+                <button type="button" class="btn-sim btn-sim-cold" data-sim="cold">❄️ Frío</button>
+                <button type="button" class="btn-sim btn-sim-normal" data-sim="normal">✅ Normal</button>
+                <button type="button" class="btn-sim btn-sim-warn" data-sim="warn">⚠️ Precaución</button>
+                <button type="button" class="btn-sim btn-sim-crit" data-sim="critical">🔥 Crítico</button>
+              </div>
+              <button type="button" class="btn-sim btn-sim-step" id="forceTickBtn">⚡ Generar lectura aleatoria</button>
             </div>
 
             <p class="live-note" id="liveNote" hidden>Conectando…</p>
           </article>
 
-          <article class="chart-card">
-            <h3 class="chart-title">Tendencia de temperatura</h3>
-            <div class="chart-wrap">
-              <canvas id="liveChart" aria-label="Gráfico de temperatura en vivo" role="img"></canvas>
+          <!-- Columna Derecha: KPIs + Gráfico -->
+          <div class="dashboard-right-col">
+            <div class="kpi-grid" aria-label="Indicadores estadísticos de la sesión">
+              <article class="kpi-card kpi-max">
+                <span class="kpi-label">🔺 Pico Máximo</span>
+                <strong class="kpi-value" id="kpiMaxTemp">-- °C</strong>
+                <span class="kpi-sub">Máx. en sesión</span>
+              </article>
+
+              <article class="kpi-card kpi-min">
+                <span class="kpi-label">🔻 Mínima</span>
+                <strong class="kpi-value" id="kpiMinTemp">-- °C</strong>
+                <span class="kpi-sub">Mín. en sesión</span>
+              </article>
+
+              <article class="kpi-card kpi-hum">
+                <span class="kpi-label">💧 Humedad Prom.</span>
+                <strong class="kpi-value" id="kpiAvgHum">-- %</strong>
+                <span class="kpi-sub">Media acumulada</span>
+              </article>
+
+              <article class="kpi-card kpi-comfort">
+                <span class="kpi-label">🌿 Confort Térmico</span>
+                <strong class="kpi-value kpi-value-text" id="kpiComfort">Calculando…</strong>
+                <span class="kpi-sub" id="kpiComfortSub">Diagnóstico ambiental</span>
+              </article>
             </div>
-          </article>
+
+            <article class="chart-card">
+              <div class="chart-header">
+                <h3 class="chart-title">Tendencia de temperatura en vivo</h3>
+                <span class="pill pill-off">Últimas 30 lecturas</span>
+              </div>
+              <div class="chart-wrap">
+                <canvas id="liveChart" aria-label="Gráfico de temperatura en vivo" role="img"></canvas>
+              </div>
+            </article>
+          </div>
         </div>
       </div>
     </section>
@@ -161,58 +245,21 @@
       <div class="container">
         <header class="section-head">
           <p class="eyebrow">Registro de lecturas</p>
-          <h2>Historial y gráficos</h2>
-        <p class="section-intro">
-          Últimas <strong>5 actualizaciones</strong> del sensor simulado. El gráfico muestra la tendencia más reciente.
-        </p>
+          <h2>Historial y gráficos del sensor</h2>
+          <p class="section-intro">
+            Últimas <strong>5 actualizaciones</strong> del sensor simulado y curva histórica comparativa de temperatura y humedad.
+          </p>
         </header>
 
         <div class="alert alert-info" id="historyEmpty" role="status" hidden>
           Aún no hay lecturas. Espere unos segundos y la primera aparecerá automáticamente.
         </div>
 
-        <article class="weather-card weather-card-gps" id="geoWeather" hidden>
-          <div class="weather-card-header">
-            <div>
-              <h3 id="geoLocation">Mi ubicación</h3>
-              <p id="geoTime">Actualizado —</p>
-            </div>
-            <div class="weather-main">
-              <span class="weather-icon" id="geoIcon" aria-hidden="true">🌡️</span>
-              <div>
-                <span class="weather-temp" id="geoTemp">--°</span>
-                <span class="weather-desc" id="geoDesc">—</span>
-              </div>
-            </div>
-          </div>
-          <div class="weather-grid">
-            <div class="weather-stat">
-              <span class="stat-label">Sensación térmica</span>
-              <span class="stat-value" id="geoFeels">-- °C</span>
-            </div>
-            <div class="weather-stat">
-              <span class="stat-label">Humedad</span>
-              <span class="stat-value" id="geoHumidity">-- %</span>
-            </div>
-            <div class="weather-stat">
-              <span class="stat-label">Viento</span>
-              <span class="stat-value" id="geoWind">-- km/h</span>
-            </div>
-          </div>
-          <div class="geo-actions">
-            <button type="button" class="btn btn-ghost" id="geoRefresh">Actualizar ubicación</button>
-          </div>
-        </article>
-
-        <div class="geo-controls">
-          <button type="button" class="btn btn-primary" id="geoBtn">Usar mi ubicación</button>
-          <p class="weather-source" id="geoSource" hidden>
-            Datos proporcionados por <a href="https://open-meteo.com/es" target="_blank" rel="noopener noreferrer">Open-Meteo</a> y <a href="https://nominatim.org/es" target="_blank" rel="noopener noreferrer">Nominatim (OpenStreetMap)</a>
-          </p>
-        </div>
-
         <article class="chart-card" style="margin-bottom:1.75rem;">
-          <h3 class="chart-title">Temperatura y humedad</h3>
+          <div class="chart-header">
+            <h3 class="chart-title">Temperatura y humedad histórica</h3>
+            <span class="pill pill-off">Doble escala</span>
+          </div>
           <div class="chart-wrap chart-wrap-tall">
             <canvas id="historyChart" aria-label="Gráfico de historial" role="img"></canvas>
           </div>
@@ -237,15 +284,85 @@
       </div>
     </section>
 
+    <!-- CLIMA POR CIUDAD -->
+    <section class="section" id="clima-ciudad">
+      <div class="container">
+        <header class="section-head">
+          <p class="eyebrow">Clima en tiempo real</p>
+          <h2>Clima por ciudad</h2>
+          <p class="section-intro">
+            Consulta el clima actual y el pronóstico de 5 días de cualquier ciudad con <strong>Open-Meteo</strong>. El fondo de la tarjeta se adapta automáticamente al clima consultado.
+          </p>
+        </header>
+
+        <div class="alert" id="weatherMessage" role="status" hidden></div>
+
+        <form id="weatherForm" class="search-bar" autocomplete="off" novalidate>
+          <input id="cityInput" type="search" placeholder="Buscar ciudad (ej. Puerto Montt, Santiago de Chile, Madrid, Lima)" aria-label="Nombre de la ciudad" spellcheck="false" />
+          <button type="submit" class="btn btn-primary">Buscar</button>
+        </form>
+
+        <div class="suggestions" id="citySuggestions">
+          <span>Sugerencias:</span>
+          <button type="button" data-city="Puerto Montt, Chile">Puerto Montt</button>
+          <button type="button" data-city="Santiago de Chile">Santiago de Chile</button>
+          <button type="button" data-city="Valparaíso, Chile">Valparaíso</button>
+          <button type="button" data-city="Concepción, Chile">Concepción</button>
+          <button type="button" data-city="Buenos Aires, Argentina">Buenos Aires</button>
+          <button type="button" data-city="Madrid, España">Madrid</button>
+          <button type="button" data-city="Lima, Perú">Lima</button>
+        </div>
+
+        <article class="weather-card wx-theme-clear" id="currentWeather" hidden>
+          <div class="weather-card-header">
+            <div>
+              <span class="wx-theme-badge" id="weatherThemeBadge">Condición actual</span>
+              <h3 id="weatherLocation">Ciudad</h3>
+              <p id="weatherTime">Actualizado —</p>
+            </div>
+            <div class="weather-main">
+              <span class="weather-icon" id="weatherIcon" aria-hidden="true">☀️</span>
+              <div>
+                <span class="weather-temp" id="weatherTemp">--°</span>
+                <span class="weather-desc" id="weatherDesc">—</span>
+              </div>
+            </div>
+          </div>
+          <div class="weather-grid">
+            <div class="weather-stat">
+              <span class="stat-label">🌡️ Sensación térmica</span>
+              <span class="stat-value" id="weatherFeels">-- °C</span>
+            </div>
+            <div class="weather-stat">
+              <span class="stat-label">💧 Humedad</span>
+              <span class="stat-value" id="weatherHumidity">-- %</span>
+            </div>
+            <div class="weather-stat">
+              <span class="stat-label">💨 Viento</span>
+              <span class="stat-value" id="weatherWind">-- km/h</span>
+            </div>
+          </div>
+        </article>
+
+        <div>
+          <h3 class="forecast-title" id="forecastTitle" hidden>Pronóstico para los próximos 5 días</h3>
+          <div class="forecast-grid" id="forecastGrid"></div>
+        </div>
+
+        <p class="weather-source" id="weatherSource" hidden>
+          Datos proporcionados por <a href="https://open-meteo.com/es" target="_blank" rel="noopener noreferrer">Open-Meteo</a> • Geocoding + Forecast (sin API Key)
+        </p>
+      </div>
+    </section>
+
     <!-- CONFIGURACIÓN -->
-    <section class="section" id="configuracion">
+    <section class="section section-soft" id="configuracion">
       <div class="container">
         <header class="section-head">
           <p class="eyebrow">Parámetros del sistema</p>
           <h2>Configurar umbrales de alerta</h2>
           <p class="section-intro">
-            Los umbrales definen cuándo cambia el estado de alerta. Se validan en el navegador
-            (rangos y coherencia) y se guardan en la persistencia seleccionada.
+            Los umbrales definen cuándo cambia el estado de alerta y el tope de la barra térmica del Dashboard. Se validan en el navegador y se guardan de forma segura.
           </p>
         </header>
 
@@ -301,103 +418,29 @@
       </div>
     </section>
 
-    <!-- CLIMA POR CIUDAD -->
-    <section class="section section-soft" id="clima-ciudad">
-      <div class="container">
-        <header class="section-head">
-          <p class="eyebrow">Clima en tiempo real</p>
-          <h2>Clima por ciudad</h2>
-          <p class="section-intro">
-            Consulta el clima actual y el pronóstico para los próximos 5 días de cualquier ciudad
-            del mundo. Usa <strong>Open-Meteo</strong> (sin API key, solo con tu navegador).
-          </p>
-        </header>
-
-        <div class="alert" id="weatherMessage" role="status" hidden></div>
-
-        <form id="weatherForm" class="search-bar" autocomplete="off">
-          <input id="cityInput" type="search" placeholder="Buscar ciudad (ej. Santiago de Chile, Madrid, Lima, Buenos Aires)" aria-label="Nombre de la ciudad" spellcheck="false" />
-          <button type="submit" class="btn btn-primary">Buscar</button>
-        </form>
-
-        <div class="suggestions" id="citySuggestions">
-          <span>Sugerencias:</span>
-          <button type="button" data-city="Santiago de Chile">Santiago de Chile</button>
-          <button type="button" data-city="Valparaíso, Chile">Valparaíso</button>
-          <button type="button" data-city="Concepción, Chile">Concepción</button>
-          <button type="button" data-city="Buenos Aires, Argentina">Buenos Aires</button>
-          <button type="button" data-city="Madrid, España">Madrid</button>
-          <button type="button" data-city="Lima, Perú">Lima</button>
-          <button type="button" data-city="Bogotá, Colombia">Bogotá</button>
-        </div>
-
-        <article class="weather-card" id="currentWeather" hidden>
-          <div class="weather-card-header">
-            <div>
-              <h3 id="weatherLocation">Ciudad</h3>
-              <p id="weatherTime">Actualizado —</p>
-            </div>
-            <div class="weather-main">
-              <span class="weather-icon" id="weatherIcon" aria-hidden="true">☀️</span>
-              <div>
-                <span class="weather-temp" id="weatherTemp">--°</span>
-                <span class="weather-desc" id="weatherDesc">—</span>
-              </div>
-            </div>
-          </div>
-          <div class="weather-grid">
-            <div class="weather-stat">
-              <span class="stat-label">Sensación térmica</span>
-              <span class="stat-value" id="weatherFeels">-- °C</span>
-            </div>
-            <div class="weather-stat">
-              <span class="stat-label">Humedad</span>
-              <span class="stat-value" id="weatherHumidity">-- %</span>
-            </div>
-            <div class="weather-stat">
-              <span class="stat-label">Viento</span>
-              <span class="stat-value" id="weatherWind">-- km/h</span>
-            </div>
-          </div>
-        </article>
-
-        <div>
-          <h3 class="forecast-title" id="forecastTitle" hidden>Pronóstico para los próximos 5 días</h3>
-          <div class="forecast-grid" id="forecastGrid"></div>
-        </div>
-
-        <p class="weather-source" id="weatherSource" hidden>
-          Datos proporcionados por <a href="https://open-meteo.com/es" target="_blank" rel="noopener noreferrer">Open-Meteo</a> • Geocoding + Forecast (sin API Key)
-        </p>
-      </div>
-    </section>
-
-    <!-- ARQUITECTURA -->
+    <!-- ARQUITECTURA MVC -->
     <section class="section section-accent" id="arquitectura">
       <div class="container">
         <header class="section-head">
-          <p class="eyebrow eyebrow-invert">Sobre esta demo</p>
-          <h2>Demo estática vs. aplicación MVC</h2>
+          <p class="eyebrow eyebrow-invert">Diseño Arquitectónico</p>
+          <h2>Arquitectura MVC + Servicios Cloud</h2>
           <p class="section-intro intro-invert">
-            Esta página es una <strong>réplica estática</strong> de la interfaz: toda la lógica
-            corre en el navegador y no hay servidor. La solución oficial del desafío es la
-            aplicación <strong>ASP.NET Core MVC</strong> (Vistas → Controladores → Modelo/Servicios →
-            Firebase) disponible en el repositorio y desplegada en <strong>Azure App Service</strong>.
+            La aplicación implementa el patrón <strong>Modelo-Vista-Controlador (MVC)</strong> separando claramente la interfaz de usuario, el control de eventos y la lógica de datos/APIs, desplegada en <strong>Microsoft Azure</strong>.
           </p>
         </header>
 
         <div class="grid grid-3">
           <article class="card card-invert">
-            <h3>Simulación</h3>
-            <p>Un temporizador del navegador genera lecturas cada 8 s (random walk) y calcula el estado con las mismas reglas que la app.</p>
+            <h3>Vista (<code>weatherView.js</code>)</h3>
+            <p>Gestiona el renderizado del DOM, las barras de nivel (gauges), los temas climáticos dinámicos, el Modo Oscuro y los gráficos en Chart.js.</p>
           </article>
           <article class="card card-invert">
-            <h3>Persistencia</h3>
-            <p>LocalStorage por defecto; con la URL de Firebase configurada en <code>demo/demo.js</code> usa Realtime Database vía REST.</p>
+            <h3>Controlador (<code>weatherController.js</code>)</h3>
+            <p>Recibe las interacciones del usuario (cambio de tema, búsqueda de ciudad, actualización GPS y guardado de umbrales) y sincroniza la Vista con el Modelo.</p>
           </article>
           <article class="card card-invert">
-            <h3>Código fuente</h3>
-            <p>El proyecto MVC completo está en el <a href="https://github.com/hugoamedinao27-beep/Estacion_metereologica" style="color:#bfdbfe;">repositorio de GitHub</a>.</p>
+            <h3>Modelo (<code>weatherModel.js</code>)</h3>
+            <p>Calcula estados de alerta, KPIs estadísticos (máxima, mínima, promedio y confort térmico), valida umbrales y consume <strong>Open-Meteo API</strong>.</p>
           </article>
         </div>
       </div>
@@ -409,11 +452,11 @@
     <div class="container footer-inner">
       <div class="footer-brand">
         <span class="brand-text">MeteoGuard</span>
-        <p>Demo estática · Estación meteorológica IoT. La aplicación MVC completa se despliega en Azure App Service.</p>
+        <p>Estación meteorológica IoT con Arquitectura MVC desplegada en Microsoft Azure.</p>
       </div>
       <div class="footer-meta">
         <p class="footer-label">Proyecto académico</p>
-        <p>Asignatura: Internet de las Cosas / Programación en la Nube</p>
+        <p>Asignatura: Arquitectura de Sistemas / Programación en la Nube</p>
         <p>Daniel Madrid · Diego Oyarzo · Nicolás Díaz · Hugo Medina</p>
         <p>Docente: Osvaldo Archile</p>
       </div>
@@ -423,9 +466,8 @@
     </div>
   </footer>
 
-  <script src="wwwroot/js/site.js" defer></script>
-  <script src="demo/demo.js" defer></script>
-  <script src="demo/weather.js" defer></script>
-  <script src="demo/weather-geo.js" defer></script>
+  <script src="js/models/weatherModel.js" defer></script>
+  <script src="js/views/weatherView.js" defer></script>
+  <script src="js/controllers/weatherController.js" defer></script>
 </body>
 </html>
