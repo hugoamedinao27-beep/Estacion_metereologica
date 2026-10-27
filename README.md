@@ -56,21 +56,17 @@ El proyecto sigue el patrón **Modelo – Vista – Controlador** implementado e
 
 ## 📁 Estructura del proyecto
 
-Estacion_metereologica/
-│
-├── index.html                      # Página principal (demo estática)
-├── README.md                       # Este archivo
-│
-├── wwwroot/
-│   ├── css/
-│   │   └── styles.css              # Estilos globales y temas
-│   └── js/
-│       ├── site.js                 # Interacciones de UI (menú móvil)
-│       ├── weatherModel.js         # Capa Modelo (MVC)
-│       ├── weatherView.js          # Capa Vista (MVC)
-│       └── weatherController.js    # Capa Controlador (MVC)
-│
-└── demo/
-    ├── demo.js                     # Simulación y persistencia
-    ├── weather.js                  # Clima por ciudad
-    └── weather-geo.js              # Clima por geolocalización
+| Archivo / Carpeta | Descripción |
+| :--- | :--- |
+| `index.html` | Página principal de la demo estática |
+| `README.md` | Documentación del proyecto |
+| **`wwwroot/`** | Carpeta de recursos web |
+| `wwwroot/css/styles.css` | Estilos globales y temas claro/oscuro |
+| `wwwroot/js/weatherModel.js` | Lógica de negocio y datos (Modelo) |
+| `wwwroot/js/weatherView.js` | Renderizado del DOM (Vista) |
+| `wwwroot/js/weatherController.js` | Orquestador de eventos (Controlador) |
+| `wwwroot/js/site.js` | Menú móvil y UI |
+| **`demo/`** | Scripts de la demo |
+| `demo/demo.js` | Simulación de sensores |
+| `demo/weather.js` | Clima por ciudad |
+| `demo/weather-geo.js` | Clima por geolocalización |
