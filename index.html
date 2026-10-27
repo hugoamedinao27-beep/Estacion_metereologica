@@ -60,9 +60,9 @@
           <p class="eyebrow">Temática N.º 7 · Monitoreo Meteorológico IoT</p>
           <h1>Clima en tiempo real, decidido con datos</h1>
           <p class="lead">
-            <strong>MeteoGuard</strong> mide <strong>temperatura y humedad</strong>, clasifica el
+            <strong>MeteoGuard</strong> simula lecturas de <strong>temperatura y humedad</strong>, clasifica el
             ambiente en estados de alerta mediante su <strong>Modelo MVC</strong> y permite configurar
-            umbrales con historial, KPIs estadísticos y conexión directa a <strong>Open-Meteo</strong>.
+            umbrales con historial y KPIs. También consulta el clima real por ciudad o ubicación con <strong>Open-Meteo</strong>.
           </p>
           <div class="hero-actions">
             <a class="btn btn-primary" href="#dashboard">Ver dashboard en vivo</a>
@@ -91,7 +91,7 @@
           <div class="gps-location-banner">
             <div>
               <p class="geo-loc-label" id="homeGeoLoc">📍 Obteniendo ubicación...</p>
-              <span class="geo-desc-label" id="homeGeoDesc">Sincronizando con satélite...</span>
+              <span class="geo-desc-label" id="homeGeoDesc">Consultando la ubicación del navegador...</span>
             </div>
             <span class="geo-weather-emoji" id="homeGeoIcon" aria-hidden="true">🌡️</span>
           </div>
@@ -189,6 +189,7 @@
                 <button type="button" class="btn-sim btn-sim-cold" data-sim="cold">❄️ Frío</button>
                 <button type="button" class="btn-sim btn-sim-normal" data-sim="normal">✅ Normal</button>
                 <button type="button" class="btn-sim btn-sim-warn" data-sim="warn">⚠️ Precaución</button>
+                <button type="button" class="btn-sim btn-sim-hot" data-sim="hot">🌡️ Calor</button>
                 <button type="button" class="btn-sim btn-sim-crit" data-sim="critical">🔥 Crítico</button>
               </div>
               <button type="button" class="btn-sim btn-sim-step" id="forceTickBtn">⚡ Generar lectura aleatoria</button>
@@ -199,23 +200,23 @@
 
           <!-- Columna Derecha: KPIs + Gráfico -->
           <div class="dashboard-right-col">
-            <div class="kpi-grid" aria-label="Indicadores estadísticos de la sesión">
+            <div class="kpi-grid" aria-label="Indicadores de las últimas 120 lecturas guardadas">
               <article class="kpi-card kpi-max">
                 <span class="kpi-label">🔺 Pico Máximo</span>
                 <strong class="kpi-value" id="kpiMaxTemp">-- °C</strong>
-                <span class="kpi-sub">Máx. en sesión</span>
+                <span class="kpi-sub">Últimas 120 lecturas</span>
               </article>
 
               <article class="kpi-card kpi-min">
                 <span class="kpi-label">🔻 Mínima</span>
                 <strong class="kpi-value" id="kpiMinTemp">-- °C</strong>
-                <span class="kpi-sub">Mín. en sesión</span>
+                <span class="kpi-sub">Últimas 120 lecturas</span>
               </article>
 
               <article class="kpi-card kpi-hum">
                 <span class="kpi-label">💧 Humedad Prom.</span>
                 <strong class="kpi-value" id="kpiAvgHum">-- %</strong>
-                <span class="kpi-sub">Media acumulada</span>
+                <span class="kpi-sub">Últimas 120 lecturas</span>
               </article>
 
               <article class="kpi-card kpi-comfort">
@@ -233,6 +234,7 @@
               <div class="chart-wrap">
                 <canvas id="liveChart" aria-label="Gráfico de temperatura en vivo" role="img"></canvas>
               </div>
+              <p class="alert alert-warning" id="liveChartMessage" role="status" hidden></p>
             </article>
           </div>
         </div>
@@ -247,6 +249,7 @@
           <h2>Historial y gráficos del sensor</h2>
           <p class="section-intro">
             Últimas <strong>5 actualizaciones</strong> del sensor simulado y curva histórica comparativa de temperatura y humedad.
+            Los estados del historial se calculan con los umbrales actuales.
           </p>
         </header>
 
@@ -262,6 +265,7 @@
           <div class="chart-wrap chart-wrap-tall">
             <canvas id="historyChart" aria-label="Gráfico de historial" role="img"></canvas>
           </div>
+          <p class="alert alert-warning" id="historyChartMessage" role="status" hidden></p>
         </article>
 
         <div class="table-wrap">
@@ -361,7 +365,8 @@
           <p class="eyebrow">Parámetros del sistema</p>
           <h2>Configurar umbrales de alerta</h2>
           <p class="section-intro">
-            Los umbrales definen cuándo cambia el estado de alerta y el tope de la barra térmica del Dashboard. Se validan en el navegador y se guardan de forma segura.
+            Los umbrales definen cuándo cambia el estado de alerta y el tope de la barra térmica del Dashboard simulado.
+            Usa números enteros. Se guardan en este navegador y no modifican el clima consultado a las APIs.
           </p>
         </header>
 
@@ -373,25 +378,25 @@
 
             <div class="form-field">
               <label for="coldThreshold">Alerta por frío (menos de)</label>
-              <input id="coldThreshold" name="coldThreshold" type="number" min="0" max="40" step="1" value="15" />
+              <input id="coldThreshold" name="coldThreshold" type="number" min="0" max="40" step="1" value="15" required aria-describedby="coldThresholdError" />
               <span class="field-error" id="coldThresholdError"></span>
             </div>
 
             <div class="form-field">
               <label for="cautionThreshold">Precaución (desde)</label>
-              <input id="cautionThreshold" name="cautionThreshold" type="number" min="1" max="50" step="1" value="25" />
+              <input id="cautionThreshold" name="cautionThreshold" type="number" min="1" max="50" step="1" value="25" required aria-describedby="cautionThresholdError" />
               <span class="field-error" id="cautionThresholdError"></span>
             </div>
 
             <div class="form-field">
               <label for="calorThreshold">Calor (desde)</label>
-              <input id="calorThreshold" name="calorThreshold" type="number" min="2" max="60" step="1" value="28" />
+              <input id="calorThreshold" name="calorThreshold" type="number" min="2" max="60" step="1" value="28" required aria-describedby="calorThresholdError" />
               <span class="field-error" id="calorThresholdError"></span>
             </div>
 
             <div class="form-field">
               <label for="criticalThreshold">Crítico (desde)</label>
-              <input id="criticalThreshold" name="criticalThreshold" type="number" min="3" max="65" step="1" value="30" />
+              <input id="criticalThreshold" name="criticalThreshold" type="number" min="3" max="65" step="1" value="30" required aria-describedby="criticalThresholdError" />
               <span class="field-error" id="criticalThresholdError"></span>
             </div>
 

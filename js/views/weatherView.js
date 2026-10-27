@@ -9,6 +9,21 @@ window.MeteoGuard.View = (function () {
 
   var liveChart = null;
   var historyChart = null;
+  var geoUpdated = null;
+
+  function renderChartSafely(canvasId, render) {
+    var message = document.getElementById(canvasId + "Message");
+    try {
+      if (typeof Chart === "undefined") throw new Error("Chart.js no está disponible");
+      render();
+      if (message) message.hidden = true;
+    } catch (error) {
+      if (message) {
+        message.textContent = "Gráfico no disponible. Las lecturas y la tabla siguen actualizándose. Recarga la página para reintentar.";
+        message.hidden = false;
+      }
+    }
+  }
 
   function formatTime(iso) {
     var d = new Date(iso);
@@ -43,38 +58,49 @@ window.MeteoGuard.View = (function () {
     updateChartsTheme(theme);
   }
 
-  function updateChartsTheme(theme) {
+  function applyChartTheme(chart, theme) {
     var textColor = theme === "dark" ? "#94a3b8" : "#64748b";
     var gridColor = theme === "dark" ? "rgba(148, 163, 184, 0.14)" : "rgba(15, 23, 42, 0.08)";
 
+    Object.keys(chart.options.scales).forEach(function (axisKey) {
+      var scale = chart.options.scales[axisKey];
+      // No reasignar el objeto resuelto por Chart.js a su propia propiedad.
+      if (!scale.ticks) scale.ticks = {};
+      scale.ticks.color = textColor;
+      if (scale.title) scale.title.color = textColor;
+      if (scale.grid && scale.grid.drawOnChartArea !== false) {
+        scale.grid.color = gridColor;
+      }
+    });
+    if (chart.options.plugins && chart.options.plugins.legend && chart.options.plugins.legend.labels) {
+      chart.options.plugins.legend.labels.color = textColor;
+    }
+    chart.update();
+  }
+
+  function updateChartsTheme(theme) {
     [liveChart, historyChart].forEach(function (chart) {
       if (!chart) return;
-      Object.keys(chart.options.scales).forEach(function (axisKey) {
-        var scale = chart.options.scales[axisKey];
-        scale.ticks = scale.ticks || {};
-        scale.ticks.color = textColor;
-        if (scale.title) scale.title.color = textColor;
-        if (scale.grid && scale.grid.drawOnChartArea !== false) {
-          scale.grid.color = gridColor;
-        }
+      renderChartSafely(chart.canvas.id, function () {
+        applyChartTheme(chart, theme);
       });
-      if (chart.options.plugins && chart.options.plugins.legend && chart.options.plugins.legend.labels) {
-        chart.options.plugins.legend.labels.color = textColor;
-      }
-      chart.update();
     });
   }
 
-  function renderModeBanner(useFirebase, failed) {
+  function renderModeBanner(useFirebase, failed, recovered) {
     var banner = document.getElementById("modeBanner");
     if (!banner) return;
-    if (useFirebase && !failed) {
+    if (failed) {
+      banner.className = "alert alert-warning";
+      banner.textContent = "No se pudieron guardar algunos datos en este navegador. Las lecturas continúan en memoria y podrían perderse al cerrar la página.";
+    } else if (useFirebase) {
       banner.className = "alert alert-success";
       banner.innerHTML = "Persistencia: <strong>Firebase Realtime Database</strong> (nube).";
     } else {
       banner.className = "alert alert-info";
       banner.innerHTML = "Modo de persistencia: <strong>almacenamiento local del navegador</strong>.";
     }
+    if (recovered) banner.innerHTML += " Se detectaron datos guardados inválidos: se recuperaron los valores válidos y se restableció la configuración cuando fue necesario.";
   }
 
   function renderDashboard(latest, cfg, stateMeta, gauges, kpis) {
@@ -118,7 +144,7 @@ window.MeteoGuard.View = (function () {
 
   function renderLiveChart(readings) {
     var canvas = document.getElementById("liveChart");
-    if (!canvas || typeof Chart === "undefined") return;
+    if (!canvas) return;
 
     var labels = readings.map(function (r) { return formatTime(r.timestamp); });
     var values = readings.map(function (r) { return Number(r.temperature); });
@@ -150,7 +176,7 @@ window.MeteoGuard.View = (function () {
           plugins: { legend: { display: false } }
         }
       });
-      updateChartsTheme(document.documentElement.getAttribute("data-theme") || "dark");
+      applyChartTheme(liveChart, document.documentElement.getAttribute("data-theme") || "dark");
     } else {
       liveChart.data.labels = labels;
       liveChart.data.datasets[0].data = values;
@@ -181,8 +207,14 @@ window.MeteoGuard.View = (function () {
       }).join("");
     }
 
-    if (!canvas || typeof Chart === "undefined" || readings.length === 0) return;
+    if (!canvas || readings.length === 0) return;
 
+    renderChartSafely("historyChart", function () {
+      renderHistoryChart(canvas, readings);
+    });
+  }
+
+  function renderHistoryChart(canvas, readings) {
     var recent = readings.slice(-15);
     var labels = recent.map(function (r) { return formatTime(r.timestamp); });
     var temperatures = recent.map(function (r) { return Number(r.temperature); });
@@ -226,7 +258,7 @@ window.MeteoGuard.View = (function () {
           plugins: { legend: { position: "bottom" } }
         }
       });
-      updateChartsTheme(document.documentElement.getAttribute("data-theme") || "dark");
+      applyChartTheme(historyChart, document.documentElement.getAttribute("data-theme") || "dark");
     } else {
       historyChart.data.labels = labels;
       historyChart.data.datasets[0].data = temperatures;
@@ -255,13 +287,26 @@ window.MeteoGuard.View = (function () {
     if (humEl) humEl.innerHTML = data.humidity + "<small>%</small>";
     if (feelsEl) feelsEl.textContent = Math.round(data.feels) + " °C";
     if (windEl) windEl.textContent = Math.round(data.wind || 0) + " km/h";
-    if (noteEl) noteEl.textContent = "Actualizado a las " + new Date(data.updated).toLocaleTimeString("es-CL", { hour12: false });
+    geoUpdated = new Date(data.updated).toLocaleString("es-CL", { hour12: false });
+    if (noteEl) noteEl.textContent = "Última consulta: " + geoUpdated;
+    var dot = document.getElementById("homeGeoDot");
+    if (dot) dot.className = "status-dot status-normal";
   }
 
   function setGeoStatus(message, isLoading) {
     var noteEl = document.getElementById("homeGeoNote");
     var refreshBtn = document.getElementById("homeGeoRefresh");
-    if (noteEl && message) noteEl.textContent = message;
+    var dot = document.getElementById("homeGeoDot");
+    if (dot && message) dot.className = "status-dot status-precaucion";
+    if (noteEl && message) noteEl.textContent = message + (geoUpdated ? " · Último dato: " + geoUpdated : "");
+    if (message && !geoUpdated) {
+      var locEl = document.getElementById("homeGeoLoc");
+      var descEl = document.getElementById("homeGeoDesc");
+      var iconEl = document.getElementById("homeGeoIcon");
+      if (locEl) locEl.textContent = isLoading ? "📍 Obteniendo ubicación..." : "📍 Ubicación no disponible";
+      if (descEl) descEl.textContent = isLoading ? "Consultando la ubicación del navegador..." : "Puedes reintentar o consultar el clima por ciudad.";
+      if (iconEl) iconEl.textContent = isLoading ? "🌡️" : "🌍";
+    }
     if (refreshBtn) {
       refreshBtn.disabled = Boolean(isLoading);
       refreshBtn.textContent = isLoading ? "⏳ Buscando..." : "🔄 Actualizar";
@@ -285,6 +330,15 @@ window.MeteoGuard.View = (function () {
     box.hidden = false;
     box.className = "alert alert-" + type;
     box.textContent = text;
+  }
+
+  function clearCityWeather() {
+    ["currentWeather", "forecastTitle", "weatherSource"].forEach(function (id) {
+      var element = document.getElementById(id);
+      if (element) element.hidden = true;
+    });
+    var grid = document.getElementById("forecastGrid");
+    if (grid) grid.innerHTML = "";
   }
 
   function renderCityWeather(payload, getWeatherMetaFn) {
@@ -323,11 +377,11 @@ window.MeteoGuard.View = (function () {
         var card = document.createElement("article");
         card.className = "forecast-card";
         card.innerHTML =
-          '<span class="forecast-day">' + formatDay(iso) + "</span>" +
+          '<span class="forecast-day">' + escapeHtml(formatDay(iso)) + "</span>" +
           '<span class="forecast-icon">' + dInfo.icon + "</span>" +
           '<span class="forecast-temp">' + Math.round(payload.daily.temperature_2m_max[dIndex]) + "° / " + Math.round(payload.daily.temperature_2m_min[dIndex]) + "°</span>" +
           '<span class="forecast-minmax">Máx / Mín</span>' +
-          '<span class="forecast-precip">Prob. lluvia: ' + (payload.daily.precipitation_probability_max[dIndex] ?? 0) + " %</span>";
+          '<span class="forecast-precip">Prob. lluvia: ' + (payload.daily.precipitation_probability_max[dIndex] === null ? "Sin datos" : payload.daily.precipitation_probability_max[dIndex] + " %") + "</span>";
         forecastGrid.appendChild(card);
       });
     }
@@ -343,10 +397,10 @@ window.MeteoGuard.View = (function () {
 
   function readThresholdsForm() {
     return {
-      coldThreshold: Number(document.getElementById("coldThreshold").value),
-      cautionThreshold: Number(document.getElementById("cautionThreshold").value),
-      calorThreshold: Number(document.getElementById("calorThreshold").value),
-      criticalThreshold: Number(document.getElementById("criticalThreshold").value)
+      coldThreshold: document.getElementById("coldThreshold").value.trim(),
+      cautionThreshold: document.getElementById("cautionThreshold").value.trim(),
+      calorThreshold: document.getElementById("calorThreshold").value.trim(),
+      criticalThreshold: document.getElementById("criticalThreshold").value.trim()
     };
   }
 
@@ -355,7 +409,10 @@ window.MeteoGuard.View = (function () {
       var input = document.getElementById(field);
       var error = document.getElementById(field + "Error");
       if (error) error.textContent = "";
-      if (input) input.classList.remove("input-validation-error");
+      if (input) {
+        input.classList.remove("input-validation-error");
+        input.removeAttribute("aria-invalid");
+      }
     });
   }
 
@@ -364,7 +421,10 @@ window.MeteoGuard.View = (function () {
       var input = document.getElementById(field);
       var error = document.getElementById(field + "Error");
       if (error) error.textContent = errors[field];
-      if (input) input.classList.add("input-validation-error");
+      if (input) {
+        input.classList.add("input-validation-error");
+        input.setAttribute("aria-invalid", "true");
+      }
     });
   }
 
@@ -380,12 +440,15 @@ window.MeteoGuard.View = (function () {
     applyTheme: applyTheme,
     renderModeBanner: renderModeBanner,
     renderDashboard: renderDashboard,
-    renderLiveChart: renderLiveChart,
+    renderLiveChart: function (readings) {
+      renderChartSafely("liveChart", function () { renderLiveChart(readings); });
+    },
     renderHistory: renderHistory,
     renderUnifiedGeoCard: renderUnifiedGeoCard,
     setGeoStatus: setGeoStatus,
     setCitySearchLoading: setCitySearchLoading,
     showWeatherMessage: showWeatherMessage,
+    clearCityWeather: clearCityWeather,
     renderCityWeather: renderCityWeather,
     fillThresholdsForm: fillThresholdsForm,
     readThresholdsForm: readThresholdsForm,

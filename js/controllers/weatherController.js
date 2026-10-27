@@ -8,6 +8,12 @@ window.MeteoGuard.Controller = (function (Model, View) {
   "use strict";
 
   var REFRESH_MS = 5000;
+  var citySearchId = 0;
+
+  function refreshStorageBanner() {
+    var status = Model.getStorageStatus();
+    View.renderModeBanner(Model.isUsingFirebase(), status.failed, status.recovered);
+  }
 
   function setupThemeToggle() {
     var currentTheme = Model.getSavedTheme();
@@ -21,6 +27,7 @@ window.MeteoGuard.Controller = (function (Model, View) {
       var nextTheme = active === "dark" ? "light" : "dark";
       Model.saveTheme(nextTheme);
       View.applyTheme(nextTheme);
+      refreshStorageBanner();
     });
   }
 
@@ -32,12 +39,14 @@ window.MeteoGuard.Controller = (function (Model, View) {
     toggle.addEventListener("click", function () {
       var isOpen = nav.classList.toggle("is-open");
       toggle.setAttribute("aria-expanded", String(isOpen));
+      toggle.setAttribute("aria-label", isOpen ? "Cerrar menú de navegación" : "Abrir menú de navegación");
     });
 
     nav.addEventListener("click", function (e) {
       if (e.target.closest("a")) {
         nav.classList.remove("is-open");
         toggle.setAttribute("aria-expanded", "false");
+        toggle.setAttribute("aria-label", "Abrir menú de navegación");
       }
     });
   }
@@ -54,6 +63,7 @@ window.MeteoGuard.Controller = (function (Model, View) {
     View.renderDashboard(latest, cfg, stateMeta, gauges, kpis);
     View.renderLiveChart(readings.slice(-30));
     View.renderHistory(readings, Model.getStateMetadata);
+    refreshStorageBanner();
   }
 
   function setupSimulationControls() {
@@ -66,18 +76,7 @@ window.MeteoGuard.Controller = (function (Model, View) {
         if (!btn) return;
 
         var type = btn.getAttribute("data-sim");
-        var cfg = Model.getCurrentConfig();
-
-        if (type === "cold") {
-          await Model.simulateTick(cfg.coldThreshold - 3.2, 76);
-        } else if (type === "normal") {
-          var mid = Math.round(((cfg.coldThreshold + cfg.cautionThreshold) / 2) * 10) / 10;
-          await Model.simulateTick(mid, 52);
-        } else if (type === "warn") {
-          await Model.simulateTick(cfg.cautionThreshold + 0.8, 46);
-        } else if (type === "critical") {
-          await Model.simulateTick(cfg.criticalThreshold + 3.4, 33);
-        }
+        await Model.simulateState(type);
         await refreshAllViews();
       });
     }
@@ -132,7 +131,10 @@ window.MeteoGuard.Controller = (function (Model, View) {
   }
 
   async function searchCity(cityQuery) {
+    var requestId = ++citySearchId;
+    View.clearCityWeather();
     if (!cityQuery || cityQuery.trim() === "") {
+      View.setCitySearchLoading(false);
       View.showWeatherMessage("error", "Escribe el nombre de una ciudad para buscar.");
       return;
     }
@@ -142,8 +144,13 @@ window.MeteoGuard.Controller = (function (Model, View) {
 
     try {
       var payload = await Model.fetchCityWeather(cityQuery.trim());
+      // Una respuesta antigua no debe reemplazar la última ciudad solicitada.
+      if (requestId !== citySearchId) return;
       View.renderCityWeather(payload, Model.getWeatherMetadata);
+      Model.rememberCity(payload.locationName);
+      refreshStorageBanner();
     } catch (err) {
+      if (requestId !== citySearchId) return;
       View.showWeatherMessage(
         "error",
         err.message === "NOT_FOUND"
@@ -151,7 +158,7 @@ window.MeteoGuard.Controller = (function (Model, View) {
           : "Ocurrió un error al obtener el clima. Revisa tu conexión e intenta nuevamente."
       );
     } finally {
-      View.setCitySearchLoading(false);
+      if (requestId === citySearchId) View.setCitySearchLoading(false);
     }
   }
 
@@ -200,10 +207,12 @@ window.MeteoGuard.Controller = (function (Model, View) {
 
       try {
         await Model.saveConfig(values);
-        View.showSettingsMessage("success", "Umbrales guardados correctamente. El estado y los medidores se han actualizado.");
+        View.showSettingsMessage("success", "Umbrales guardados. El dashboard y el historial se interpretan con los nuevos límites.");
         await refreshAllViews();
       } catch (err) {
         View.showSettingsMessage("error", "No fue posible guardar: " + err.message);
+      } finally {
+        refreshStorageBanner();
       }
     });
   }
@@ -211,7 +220,7 @@ window.MeteoGuard.Controller = (function (Model, View) {
   async function init() {
     setupThemeToggle();
     setupMobileNav();
-    View.renderModeBanner(Model.isUsingFirebase(), false);
+    refreshStorageBanner();
 
     var cfg = await Model.loadConfig();
     View.fillThresholdsForm(cfg);
